@@ -6,6 +6,7 @@ Create Date: 2024-07-20 19:34:50.254398
 
 """
 from typing import Sequence, Union
+#from models.tags import DeclarativeBase
 
 from alembic import op
 import sqlalchemy as sa
@@ -19,8 +20,13 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    pass
+    op.create_table(
+        "content",
+        sa.Column("id", sa.Integer, primary_key=True),
+        sa.Column("name", sa.String),
+        sa.Column("content", sa.String),
+    )
 
 
 def downgrade() -> None:
-    pass
+    op.drop_table("content")
