@@ -6,7 +6,6 @@ Create Date: 2024-07-20 19:34:50.254398
 
 """
 from typing import Sequence, Union
-#from models.tags import DeclarativeBase
 
 from alembic import op
 import sqlalchemy as sa
