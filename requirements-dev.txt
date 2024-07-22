@@ -8,3 +8,7 @@ alembic~=1.13.2
 SQLAlchemy~=2.0.31
 psycopg2~=2.9.9
 psycopg2-binary~=2.9.9
+discord.py~=2.4.0
+pytest~=8.2.2
+mypy~=1.10.1
+
