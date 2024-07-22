@@ -19,8 +19,29 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    pass
+    op.add_column("tags_messages", sa.Column("tag_id", sa.Integer))
+    op.add_column("tags_messages", sa.Column("message_id", sa.Integer))
+    op.create_foreign_key(
+        "fk_tag_id",
+        "tags_messages",
+        "tag",
+        ["tag_id"],
+        ["id"],
+        onupdate = "CASCADE",
+        ondelete = "CASCADE",
+    )
+
+    op.create_foreign_key(
+        "fk_message_id_2",
+        "tags_messages",
+        "message",
+        ["message_id"],
+        ["id"],
+        onupdate = "CASCADE",
+        ondelete = "CASCADE",
+    )
 
 
 def downgrade() -> None:
-    pass
+    op.drop_column("tags_messages", "tag_id")
+    op.drop_column("tags_messages", "message_id")

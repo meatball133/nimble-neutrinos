@@ -19,8 +19,14 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    pass
+    op.create_table(
+        "channel",
+        sa.Column("id", sa.Integer, primary_key=True, nullable=False),
+        sa.Column("discord_id", sa.Integer, nullable=False),
+        sa.Column("enabled", sa.Boolean, nullable=False),
+        sa.Column("server_id", sa.Integer, nullable=False),
+    )
 
 
 def downgrade() -> None:
-    pass
+    op.drop_table("channel")

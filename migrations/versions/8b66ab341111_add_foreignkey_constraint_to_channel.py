@@ -19,8 +19,16 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    pass
+    op.create_foreign_key(
+        "fk_server_id",
+        "channel",
+        "server",
+        ["server_id"],
+        ["id"],
+        onupdate = "CASCADE",
+        ondelete = "CASCADE",
+    )
 
 
 def downgrade() -> None:
-    pass
+    op.drop_constraint("fk_server_id", "channel", type_="foreignkey")

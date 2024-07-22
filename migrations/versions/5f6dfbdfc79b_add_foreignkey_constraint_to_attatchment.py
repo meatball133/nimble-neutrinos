@@ -19,8 +19,16 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    pass
+    op.create_foreign_key(
+        "fk_attachment_message_id",
+        "attachment",
+        "message",
+        ["message_id"],
+        ["id"],
+        onupdate = "CASCADE",
+        ondelete = "CASCADE",
+    )
 
 
 def downgrade() -> None:
-    pass
+    op.drop_constraint("fk_attachment_message_id", "attachment", type_="foreignkey")
