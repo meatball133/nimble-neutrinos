@@ -61,11 +61,3 @@ class Model:
         tag = self.session.scalar(stmt)
         self.session.delete(tag)
         self.session.commit()
-
-model = Model()
-
-#tag = model.get_tag_by_id(2)
-
-print(model.create_tag("test"))
-
-#print(model.get_tag_by_id(2).one().name)
