@@ -7,3 +7,7 @@ def mainpage():
 
 def gallery():
     return render_template("gallery.j2")
+
+
+def management():
+    return render_template("management.j2")
