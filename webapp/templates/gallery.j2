@@ -1,0 +1,16 @@
+{% extends 'base.j2' %}
+{% block content %}
+    <div id="navbar">
+        <div id="channel-selector">
+            <span id="channel-selector-text">
+                Loading...
+            </span>
+        </div>
+        <input type="text" placeholder="Search..." id="search-box">
+        <div id="view-mode-buttons">
+            <a href="#" class="view-mode-button">All</a>
+            <a href="#" class="view-mode-button">Mine</a>
+            <a href="#" class="view-mode-button">Favs</a>
+        </div>
+    </div>
+{% endblock %}

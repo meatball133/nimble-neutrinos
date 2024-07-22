@@ -1,0 +1,11 @@
+{% block header %}
+    <header>
+        <h1 id="page-title">CordPics</h1>
+        {% if user %}
+            <span id="username">{{ user.username }}</span>
+            <img src="{{ user.avatar_url }}" alt="Avatar">
+        {% else %}
+            <button id="login-button">Login</button>
+        {% endif %}
+    </header>
+{% endblock %}
