@@ -19,8 +19,10 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    pass
+    op.add_column("user", sa.Column("access_token", sa.String(), nullable=True))
+    op.add_column("user", sa.Column("refresh_token", sa.String(), nullable=True))
 
 
 def downgrade() -> None:
-    pass
+    op.drop_column("user", "refresh_token")
+    op.drop_column("user", "access_token")
