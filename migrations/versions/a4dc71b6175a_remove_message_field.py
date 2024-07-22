@@ -19,8 +19,8 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    pass
+    op.drop_column("attachment", "message")
 
 
 def downgrade() -> None:
-    pass
+    op.add_column("attachment", sa.Column("message", sa.String(), nullable=True))
