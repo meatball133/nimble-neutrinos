@@ -15,7 +15,7 @@ class Model:
    
     def get_tags(self) -> list[Tag]:
         stmt = select(Tag)
-        return self.session.scalars(stmt)
+        return list(self.session.scalars(stmt))
     
     def get_tag_by_id(self, id: int) -> Tag:
         stmt = select(Tag).where(Tag.id == id)
@@ -41,7 +41,7 @@ class Model:
 
     def get_users(self) -> list[User]:
         stmt = select(User)
-        return self.session.scalars(stmt)
+        return list(self.session.scalars(stmt))
     
     def get_user_by_id(self, id: int) -> User:
         stmt = select(User).where(User.id == id)
@@ -67,24 +67,24 @@ class Model:
 
     def get_messages(self) -> list[Message]:
         stmt = select(Message)
-        return self.session.scalars(stmt)
+        return list(self.session.scalars(stmt))
     
     def get_message_by_id(self, id: int) -> Message:
         stmt = select(Message).where(Message.id == id)
         return self.session.scalars(stmt).one()
     
-    def create_message(self, discord_id: int, channel_id: int, author: int, tags: list[int]) -> int:
-        new_message = Message(discord_id=discord_id, channel_id=channel_id, author=author, tags=tags)
+    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag]) -> int:
+        new_message = Message(discord_id=discord_id, channel_id=channel_id, user_id=user_id, tags=tags)
         self.session.add(new_message)
         self.session.commit()
         return new_message.id
     
-    def update_message(self, id: int, discord_id: int, channel_id: int, author: int, tags: list[int]) -> NoReturn:
+    def update_message(self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[int]) -> NoReturn:
         stmt = select(Message).where(Message.id == id)
         message = self.session.scalar(stmt)
         message.discord_id = discord_id
         message.channel_id = channel_id
-        message.author = author
+        message.user_id = user_id
         message.tags = tags
         self.session.commit()
 
@@ -96,7 +96,7 @@ class Model:
 
     def get_attachments(self) -> list[Attachment]:
         stmt = select(Attachment)
-        return self.session.scalars(stmt)
+        return list(self.session.scalars(stmt))
     
     def get_attachment_by_id(self, id: int) -> Attachment:
         stmt = select(Attachment).where(Attachment.id == id)
@@ -123,7 +123,7 @@ class Model:
 
     def get_channels(self) -> list[Channel]:
         stmt = select(Channel)
-        return self.session.scalars(stmt)
+        return list(self.session.scalars(stmt))
     
     def get_channel_by_id(self, id: int) -> Channel:
         stmt = select(Channel).where(Channel.id == id)
@@ -151,7 +151,7 @@ class Model:
 
     def get_servers(self) -> list[Server]:
         stmt = select(Server)
-        return self.session.scalars(stmt)
+        return list(self.session.scalars(stmt))
 
     def get_server_by_id(self, id: int) -> Server:
         stmt = select(Server).where(Server.id == id)
