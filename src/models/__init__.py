@@ -79,7 +79,7 @@ class Model:
         self.session.commit()
         return new_message.id
     
-    def update_message(self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[int]) -> NoReturn:
+    def update_message(self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[Tag]) -> NoReturn:
         stmt = select(Message).where(Message.id == id)
         message = self.session.scalar(stmt)
         message.discord_id = discord_id
