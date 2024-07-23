@@ -47,16 +47,18 @@ class Model:
         stmt = select(User).where(User.id == id)
         return self.session.scalars(stmt).one()
     
-    def create_user(self, discord_id: int) -> int:
-        new_user = User(discord_id=discord_id)
+    def create_user(self, discord_id: int, access_token: str, refresh_token: str) -> int:
+        new_user = User(discord_id=discord_id, access_token=access_token, refresh_token=refresh_token)
         self.session.add(new_user)
         self.session.commit()
         return new_user.id
     
-    def update_user(self, id: int, discord_id: int) -> NoReturn:
+    def update_user(self, id: int, discord_id: int, access_token: str, refresh_token: str) -> NoReturn:
         stmt = select(User).where(User.id == id)
         user = self.session.scalar(stmt)
         user.discord_id = discord_id
+        user.access_token = access_token
+        user.refresh_token = refresh_token
         self.session.commit()
 
     def delete_user(self, id: int) -> NoReturn:
