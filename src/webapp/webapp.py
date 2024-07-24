@@ -1,6 +1,5 @@
 from flask import Flask
-import endpoints
-
+from src.webapp import endpoints
 app = Flask(__name__)
 
 app.add_url_rule('/', view_func=endpoints.mainpage)
