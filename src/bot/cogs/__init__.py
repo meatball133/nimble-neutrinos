@@ -1,1 +1,3 @@
-INITIAL_EXTENSIONS = []
+INITIAL_EXTENSIONS = [
+    "cogs.owner"
+]
