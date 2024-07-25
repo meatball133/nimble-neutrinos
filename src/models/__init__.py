@@ -12,6 +12,23 @@ from typing import List, NoReturn
 class Model:
     def __init__(self):
         self.session = get_session()
+
+    def close(self) -> NoReturn:
+        self.session.close()
+    
+    def delete(self) -> NoReturn:
+        self.session.query(User).delete()
+        self.session.commit()
+        self.session.query(Tag).delete()
+        self.session.commit()
+        self.session.query(Message).delete()
+        self.session.commit()
+        self.session.query(Attachment).delete()
+        self.session.commit()
+        self.session.query(Channel).delete()
+        self.session.commit()
+        self.session.query(Server).delete()
+        self.session.commit()
    
     def get_tags(self) -> list[Tag]:
         stmt = select(Tag)
