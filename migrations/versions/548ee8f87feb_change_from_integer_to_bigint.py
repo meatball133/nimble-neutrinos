@@ -19,8 +19,16 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    pass
+    op.alter_column('user', 'discord_id', type_=sa.BigInteger)
+    op.alter_column('server', 'discord_id', type_=sa.BigInteger)
+    op.alter_column('channel', 'discord_id', type_=sa.BigInteger)
+    op.alter_column('message', 'discord_id', type_=sa.BigInteger)
+    op.alter_column('attachment', 'discord_id', type_=sa.BigInteger) 
 
 
 def downgrade() -> None:
-    pass
+    op.alter_column('attachment', 'discord_id', type_=sa.Integer)
+    op.alter_column('message', 'discord_id', type_=sa.Integer)
+    op.alter_column('channel', 'discord_id', type_=sa.Integer)
+    op.alter_column('server', 'discord_id', type_=sa.Integer)
+    op.alter_column('user', 'discord_id', type_=sa.Integer)
