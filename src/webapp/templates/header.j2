@@ -5,7 +5,9 @@
             <span id="username">{{ user.username }}</span>
             <img src="{{ user.avatar_url }}" alt="Avatar">
         {% else %}
-            <button id="login-button">Login</button>
+            <a href="{{ url_for('login') }}">
+                <button id="login-button">Login</button>
+            </a>
         {% endif %}
     </header>
 {% endblock %}

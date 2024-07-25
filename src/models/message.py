@@ -1,7 +1,7 @@
-from config.db import Base
+from src.config.db import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Table, ForeignKey, Column
-from models.tags import Tag
+from src.models.tags import Tag
 from typing import List
 
 association_table = Table(

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column
-from config.db import Base
+from src.config.db import Base, engine
 
 
 class Attachment(Base):
@@ -8,4 +8,3 @@ class Attachment(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     discord_id: Mapped[int] = mapped_column()
     message_id: Mapped[int] = mapped_column()
-
