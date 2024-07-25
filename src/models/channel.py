@@ -3,7 +3,7 @@ from config.db import Base
 from sqlalchemy import ForeignKey
 
 
-class Channel:
+class Channel(Base):
     __tablename__ = "channel"
 
     id: Mapped[int] = mapped_column(primary_key=True)
