@@ -42,3 +42,9 @@ ignore = [
     "ANN101",
     "ANN102",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+addopts = [
+    "--import-mode=importlib",
+]
