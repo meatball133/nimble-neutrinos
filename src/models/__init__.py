@@ -12,6 +12,23 @@ from typing import List, NoReturn
 class Model:
     def __init__(self):
         self.session = get_session()
+
+    def close(self) -> NoReturn:
+        self.session.close()
+    
+    def delete(self) -> NoReturn:
+        self.session.query(User).delete()
+        self.session.commit()
+        self.session.query(Tag).delete()
+        self.session.commit()
+        self.session.query(Message).delete()
+        self.session.commit()
+        self.session.query(Attachment).delete()
+        self.session.commit()
+        self.session.query(Channel).delete()
+        self.session.commit()
+        self.session.query(Server).delete()
+        self.session.commit()
    
     def get_tags(self) -> list[Tag]:
         """
@@ -22,7 +39,7 @@ class Model:
         """
 
         stmt = select(Tag)
-        return self.session.scalars(stmt)
+        return list(self.session.scalars(stmt))
     
     def get_tag_by_id(self, id: int) -> Tag:
         """
@@ -89,7 +106,7 @@ class Model:
             list[User]: A list of all users.
         """
         stmt = select(User)
-        return self.session.scalars(stmt)
+        return list(self.session.scalars(stmt))
     
     def get_user_by_id(self, id: int) -> User:
         """
@@ -163,7 +180,7 @@ class Model:
         """
 
         stmt = select(Message)
-        return self.session.scalars(stmt)
+        return list(self.session.scalars(stmt))
     
     def get_message_by_id(self, id: int) -> Message:
         """
@@ -178,8 +195,8 @@ class Model:
 
         stmt = select(Message).where(Message.id == id)
         return self.session.scalars(stmt).one()
-    
-    def create_message(self, discord_id: int, channel_id: int, author: int, tags: list[int]) -> int:
+
+    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag]) -> int:
         """
         Create a new message.
 
@@ -192,13 +209,15 @@ class Model:
         Returns:
             int: The id of the new message
         """
+      
+        new_message = Message(discord_id=discord_id, channel_id=channel_id, user_id=user_id, tags=tags)
 
-        new_message = Message(discord_id=discord_id, channel_id=channel_id, author=author, tags=tags)
         self.session.add(new_message)
         self.session.commit()
         return new_message.id
     
-    def update_message(self, id: int, discord_id: int, channel_id: int, author: int, tags: list[int]) -> NoReturn:
+
+    def update_message(self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[Tag]) -> NoReturn:
         """
         Update a message.
 
@@ -214,7 +233,7 @@ class Model:
         message = self.session.scalar(stmt)
         message.discord_id = discord_id
         message.channel_id = channel_id
-        message.author = author
+        message.user_id = user_id
         message.tags = tags
         self.session.commit()
 
@@ -240,7 +259,7 @@ class Model:
         """
 
         stmt = select(Attachment)
-        return self.session.scalars(stmt)
+        return list(self.session.scalars(stmt))
     
     def get_attachment_by_id(self, id: int) -> Attachment:
         """
@@ -311,7 +330,7 @@ class Model:
         """
 
         stmt = select(Channel)
-        return self.session.scalars(stmt)
+        return list(self.session.scalars(stmt))
     
     def get_channel_by_id(self, id: int) -> Channel:
         """
@@ -385,7 +404,7 @@ class Model:
         """
 
         stmt = select(Server)
-        return self.session.scalars(stmt)
+        return list(self.session.scalars(stmt))
 
     def get_server_by_id(self, id: int) -> Server:
         """
