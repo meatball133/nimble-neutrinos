@@ -62,20 +62,20 @@ input:-webkit-autofill:active {
 #filter {
     background-color: var(--filter-color);
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     border-radius: 10px;
 }
 
 #channel-select {
-    min-width: 15%;
-    width: fit-content;
+    width: 100%;
     display: flex;
     position: relative;
-    border: 1px solid black;
     align-items: center;
     cursor: pointer;
+    border-bottom: 1px solid black;
 }
   
+
 #channel-select::after {
     content: "";
     position: absolute;
@@ -158,19 +158,19 @@ input:-webkit-autofill:active {
     flex-direction: row;
     flex-wrap: wrap;
     padding: 5px 10px;
+    border-bottom: 1px solid black;
 }
 
 #search-bar {
     flex-grow: 1;
     padding: 5px;
+    border: none;
     margin: 5px 0;
 }
 
 #channel-select, #search-bar {
     background: transparent;
-    border: none;
     color: var(--text-color);
-    border-right: 1px solid black;
 }
 
 .search-bar-tag {
@@ -238,9 +238,14 @@ input:-webkit-autofill:active {
     border: none !important;
 }
 
+#channel-select,
+#extra-filters {
+    padding: 10px 0;
+}
+
 #gallery {
     margin-top: 15px;
-    column-count: 3;
+    column-count: 1;
 }
 
 .gallery-item {
@@ -403,6 +408,7 @@ input:-webkit-autofill:active {
 
 #modal-body {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
 }
 
@@ -414,11 +420,11 @@ input:-webkit-autofill:active {
 }
 
 #modal-image-info {
-    margin-top: 10px;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     gap: 5px;
+    margin: 0 10px;
 }
 
 #modal-profile {
@@ -526,4 +532,62 @@ input:-webkit-autofill:active {
     border-radius: 5px;
     cursor: pointer;
     user-select: none;
+}
+
+
+/* Tablets */
+@media only screen and (min-width: 481px) {
+    #gallery {
+        column-count: 2;
+    }
+}
+
+/* Desktop */
+@media only screen and (min-width: 769px) {
+    #gallery {
+        column-count: 3;
+    }
+
+    #filter {
+        background-color: var(--filter-color);
+        display: flex;
+        flex-direction: row;
+        border-radius: 10px;
+    }
+
+    #channel-select {
+        min-width: 15%;
+        width: fit-content;
+        display: flex;
+        position: relative;
+        border: 1px solid black;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    #channel-select, #search-filter {
+        background: transparent;
+        border: none;
+        color: var(--text-color);
+        border-right: 1px solid black;
+    }
+
+    #channel-select-text {
+        border: none;
+    }
+
+    
+    #channel-select,
+    #extra-filters {
+        padding: 0;
+    }
+
+    #modal-body {
+        flex-direction: row;
+
+    }
+
+    #modal-image-info {
+        margin: 10px 0 0 0;
+    }
 }

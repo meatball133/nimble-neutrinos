@@ -56,7 +56,7 @@ window.addEventListener("click", e => {
 });
 
 modalModify.addEventListener("click", e => {
-    window.open(`/modify/${currentImage.dataset.postId}`, '_blank').focus();
+    window.open(`/edit-tags/${currentImage.dataset.postId}`, '_blank').focus();
 });
 
 modalDelete.addEventListener("click", e => {
@@ -287,88 +287,88 @@ function addChannels(channels) {
 
 window.addEventListener("load", (e) => {
     // Todo: Implement get data and channels
-    // addData(testData);
-    // addChannels(testChannels)
+    addData(testData);
+    addChannels(testChannels)
 });
 
 // Test data below
 
-// const testData = [
-//     {
-//         image:
-//         "https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187.jpg",
-//         user: "Username",
-//         profile:
-//         "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
-//         tags: "tag1,tag2,tag3,tag4",
-//         postDate: "21/07/2024",
-//         liked: true,
-//         postId: 1,
-//     },
-//     {
-//         image:
-//         "https://www.humanesociety.org/sites/default/files/styles/400x400/public/2018/06/cat-217679.jpg",
-//         user: "Username",
-//         profile:
-//         "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
-//         tags: "tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4",
-//         postDate: "21/07/2024",
-//         liked: false,
-//         postId: 2,
-//     },
-//     {
-//         image:
-//         "https://www.usatoday.com/gcdn/authoring/authoring-images/2023/11/02/USAT/71425480007-getty-images-1498838344.jpg?crop=1060,1413,x530,y0",
-//         user: "Username",
-//         profile:
-//         "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
-//         tags: "tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4",
-//         postDate: "21/07/2024",
-//         liked: false,
-//         postId: 3,
-//     },
-//     {
-//         image:
-//         "https://www.alleycat.org/wp-content/uploads/2015/12/RS34996_BuenaVistaColony_1518.jpg",
-//         user: "Username",
-//         profile:
-//         "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
-//         tags: "tag1,tag2,tag3,tag4",
-//         postDate: "21/07/2024",
-//         liked: false,
-//         postId: 4,
-//     },
-//     {
-//         image:
-//         "https://cats.com/wp-content/uploads/2024/02/96E4B546-9BE7-4977-9A29-05F2D9BB47BC_1_102_a-e1711411797978.jpeg",
-//         user: "Username",
-//         profile:
-//         "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
-//         tags: "tag1,tag2,tag3,tag4",
-//         postDate: "21/07/2024",
-//         liked: true,
-//         postId: 5,
-//     },
-//     {
-//         image:
-//         "https://static.scientificamerican.com/sciam/cache/file/2AE14CDD-1265-470C-9B15F49024186C10_source.jpg",
-//         user: "Username",
-//         profile:
-//         "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
-//         tags: "tag1,tag2,tag3,tag4",
-//         postDate: "21/07/2024",
-//         liked: false,
-//         postId: 6,
-//     },
-// ];
+const testData = [
+    {
+        image:
+        "https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187.jpg",
+        user: "Username",
+        profile:
+        "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
+        tags: "tag1,tag2,tag3,tag4",
+        postDate: "21/07/2024",
+        liked: true,
+        postId: 1,
+    },
+    {
+        image:
+        "https://www.humanesociety.org/sites/default/files/styles/400x400/public/2018/06/cat-217679.jpg",
+        user: "Username",
+        profile:
+        "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
+        tags: "tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4",
+        postDate: "21/07/2024",
+        liked: false,
+        postId: 2,
+    },
+    {
+        image:
+        "https://www.usatoday.com/gcdn/authoring/authoring-images/2023/11/02/USAT/71425480007-getty-images-1498838344.jpg?crop=1060,1413,x530,y0",
+        user: "Username",
+        profile:
+        "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
+        tags: "tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4",
+        postDate: "21/07/2024",
+        liked: false,
+        postId: 3,
+    },
+    {
+        image:
+        "https://www.alleycat.org/wp-content/uploads/2015/12/RS34996_BuenaVistaColony_1518.jpg",
+        user: "Username",
+        profile:
+        "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
+        tags: "tag1,tag2,tag3,tag4",
+        postDate: "21/07/2024",
+        liked: false,
+        postId: 4,
+    },
+    {
+        image:
+        "https://cats.com/wp-content/uploads/2024/02/96E4B546-9BE7-4977-9A29-05F2D9BB47BC_1_102_a-e1711411797978.jpeg",
+        user: "Username",
+        profile:
+        "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
+        tags: "tag1,tag2,tag3,tag4",
+        postDate: "21/07/2024",
+        liked: true,
+        postId: 5,
+    },
+    {
+        image:
+        "https://static.scientificamerican.com/sciam/cache/file/2AE14CDD-1265-470C-9B15F49024186C10_source.jpg",
+        user: "Username",
+        profile:
+        "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
+        tags: "tag1,tag2,tag3,tag4",
+        postDate: "21/07/2024",
+        liked: false,
+        postId: 6,
+    },
+];
 
-// let testChannels = {
-//     "Server 1": [
-//         "# CH",
-//         "# CH2",
-//     ],
-//     "Server 2": [
-//         "# Images",
-//         "# Videos",
-//     ],
-// }
+let testChannels = {
+    "Server 1": [
+        "# CH",
+        "# CH2",
+    ],
+    "Server 2": [
+        "# Images",
+        "# Videos",
+    ],
+}
