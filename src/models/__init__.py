@@ -111,7 +111,7 @@ class Model:
     def get_user_by_discord_id(self, discord_id: int) -> User:
         stmt = select(User).where(User.discord_id == discord_id)
         return self.session.scalars(stmt).one_or_none()
-    
+
     def get_user_by_id(self, id: int) -> User:
         """
         Get a user by its id.
@@ -350,23 +350,20 @@ class Model:
         stmt = select(Channel).where(Channel.id == id)
         return self.session.scalars(stmt).one()
     
-    def create_channel(self, discord_id: int, enabled: bool, server_id: int) -> int:
+    def create_channel(self, discord_id: int, enabled: bool, server_id: int) -> Channel:
         """
-        Create a new channel.
+        Create a new server.
 
         Args:
-            discord_id (int): The discord id of the channel.
-            enabled (bool): Whether the channel should be checked for messages.
-            server_id (int): The server id of the channel.
+            discord_id (int): The discord id of the server.
 
         Returns:
-            int: The id of the new channel
+            int: The id of the new server.
         """
-
         new_channel = Channel(discord_id=discord_id, enabled=enabled, server_id=server_id)
         self.session.add(new_channel)
         self.session.commit()
-        return new_channel.id
+        return new_channel
     
     def update_channel(self, id: int, discord_id: int, enabled: bool, server_id: int) -> NoReturn:
         """
@@ -427,8 +424,8 @@ class Model:
     def get_server_by_discord_id(self, discord_id: int) -> Server:
         stmt = select(Server).where(Server.discord_id == discord_id)
         return self.session.scalars(stmt).one_or_none()
-    
-    def create_server(self, discord_id: int) -> int:
+
+    def create_server(self, discord_id: int) -> Server:
         """
         Create a new server.
 
@@ -438,11 +435,10 @@ class Model:
         Returns:
             int: The id of the new server.
         """
-
         new_server = Server(discord_id=discord_id)
         self.session.add(new_server)
         self.session.commit()
-        return new_server.id
+        return new_server
     
     def update_server(self, id: int, discord_id: int) -> NoReturn:
         """

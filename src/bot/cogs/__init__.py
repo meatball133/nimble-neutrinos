@@ -1,3 +1,5 @@
 INITIAL_EXTENSIONS = [
     "cogs.owner"
 ]
+
+ALL_EXTENSIONS = INITIAL_EXTENSIONS + []
