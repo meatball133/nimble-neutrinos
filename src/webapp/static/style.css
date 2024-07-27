@@ -16,6 +16,7 @@ body {
     flex-direction: column;
     font-family: "gg sans Normal", sans-serif;
     margin: 0 8px;
+    min-height: 100vh;
 }
 
 header {
@@ -32,6 +33,8 @@ h1 a {
 
 main {
     flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 select:focus-visible,
@@ -202,4 +205,20 @@ h1 {
     #hamburger::before {
         all: unset;
     }
+}
+
+#home-page-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+#tagline {
+    font-size: 4rem;
+}
+
+#welcome-text {
+    font-size: 2rem;
 }

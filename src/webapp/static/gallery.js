@@ -460,9 +460,11 @@ function addChannels(channels) {
 
 window.addEventListener("load", (e) => {
     // Todo: Implement get data and channels
+    console.log(1)
     addData(testData);
     addChannels(testChannels)
 });
+console.log(2)
 
 // Test data below
 
