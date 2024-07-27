@@ -20,6 +20,7 @@ main {
     width: 100%;
     border-radius: 25px;
     background: var(--filter-color);
+    flex-grow: 1;
     border: 3px solid black;
     margin: 10px 0;
     grid-auto-flow: dense;

@@ -3,6 +3,7 @@ const mine = document.getElementById("mine");
 const favs = document.getElementById("favs");
 let current = all;
 let currentImage;
+let currentImageIndex;
 const extraFilters = [all, mine, favs];
 for (const extraFilter of extraFilters) {
     extraFilter.addEventListener("click", (e) => {
@@ -228,6 +229,73 @@ window.addEventListener("click", e => {
     }
 });
 
+popup.addEventListener("click", e => {
+    if (e.target !== popup) return
+    popup.style.opacity = "0";
+    setTimeout(() => {
+        popup.style.zIndex = "-1";
+        
+        modalImage.src = "";
+        modalProfile.src = "";
+        modalUsername.textContent = "";
+        modalImageUploadDate.textContent = "";
+        modalTags.textContent = "";
+        if (popup.style.opacity !== "0") {
+            popup.style.opacity = "0";
+        }
+        if (mode !== "Preview") {
+            resetModal()
+        }
+    }, 1000);
+
+});
+
+const backButton = document.getElementById("back-button");
+const forwardButton = document.getElementById("forward-button");
+
+backButton.addEventListener("click", e => {
+    if (currentImageIndex === 0) {
+        return;
+    }
+    currentImageIndex -= 1;
+    setModal(currentImageIndex);
+});
+
+forwardButton.addEventListener("click", e => {
+    if (currentImageIndex === gallery.childNodes.length - 1) {
+        return;
+    }
+    currentImageIndex += 1;
+    setModal(currentImageIndex);
+});
+
+function setModal(index) {
+    let imageContainer = listOfImages[index];
+    let image = imageContainer.childNodes[0];
+    modalImage.src = image.src;
+    modalProfile.src = image.dataset.profile;
+    modalUsername.textContent = image.dataset.user;
+    modalImageUploadDate.textContent = image.dataset.postDate;
+    
+    if (image.dataset.liked === "true") {
+        modalHeart.classList.add("heart-liked");
+    } else {
+        modalHeart.classList.remove("heart-liked");
+    }
+
+    for (const tag of modalTags.childNodes) {
+        modalTags.removeChild(tag);
+    }
+
+    for (const tag of image.dataset.tags.split(",")) {
+        let tagElement = document.createElement("span");
+        tagElement.textContent = tag;
+        tagElement.classList.add('tag');
+        tagElement.classList.add('modal-tag');
+        modalTags.appendChild(tagElement)
+    }
+}
+
 let columnCount = parseInt(getComputedStyle(gallery)["columnCount"]);
 let listOfImages = [];
 function addData(dataList) {
@@ -243,6 +311,7 @@ function addData(dataList) {
         image.dataset.postDate = data.postDate;
         image.dataset.liked = data.liked;
         image.dataset.postId = data.postId;
+        image.dataset.tags = data.tags;
 
         let imageActions = document.createElement("div");
         imageActions.classList.add("image-actions");
@@ -269,8 +338,9 @@ function addData(dataList) {
         imageDarknessMask.classList.add("image-darkness-mask");
         imageDarknessMask.addEventListener("click", e => {
             currentImage = image;
+            currentImageIndex = listOfImages.indexOf(container);
             popup.style.opacity = "1";
-            popup.style.zIndex = "2";
+            popup.style.zIndex = "20";
 
             modalImage.src = data.image;
             modalProfile.src = data.profile;
@@ -291,26 +361,7 @@ function addData(dataList) {
                 modalTags.appendChild(tagElement)
             }
 
-            popup.addEventListener("click", e => {
-                if (e.target !== popup) return
-                popup.style.opacity = "0";
-                setTimeout(() => {
-                    popup.style.zIndex = "-1";
-                    
-                    modalImage.src = "";
-                    modalProfile.src = "";
-                    modalUsername.textContent = "";
-                    modalImageUploadDate.textContent = "";
-                    modalTags.textContent = "";
-                    if (popup.style.opacity !== "0") {
-                        popup.style.opacity = "0";
-                    }
-                    if (mode !== "Preview") {
-                        resetModal()
-                    }
-                }, 1000);
-
-            });
+            
         });
 
 
@@ -460,11 +511,9 @@ function addChannels(channels) {
 
 window.addEventListener("load", (e) => {
     // Todo: Implement get data and channels
-    console.log(1)
     addData(testData);
     addChannels(testChannels)
 });
-console.log(2)
 
 // Test data below
 
