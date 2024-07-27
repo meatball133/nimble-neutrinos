@@ -97,6 +97,10 @@ main {
     cursor: pointer;
 }
 
+.server-id {
+    display: none;
+}
+
 .server:hover {
     background-color: #424549;
 }

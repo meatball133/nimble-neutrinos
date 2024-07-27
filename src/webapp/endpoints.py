@@ -1,6 +1,6 @@
 from os import getenv
 
-from flask import request, render_template, session, redirect, url_for, abort
+from flask import request, render_template, session, redirect, url_for, abort, jsonify
 
 from src.webapp import db, discord_api
 
@@ -11,6 +11,21 @@ def mainpage():
 
 def gallery():
     return render_template("gallery.j2")
+
+
+def server_channels():
+    server_id = request.args.get("server_id")
+    server = db.get_server_by_discord_id(server_id)
+    channels = db.get_channels_in_server(server.id)
+    channels_json = []
+    for channel in channels:
+        channel_info = discord_api.get_channel_info(channel.discord_id)
+        channels_json.append({
+            "id": channel.id,
+            "enabled": channel.enabled,
+            "name": channel_info["name"],
+        })
+    return jsonify(channels_json)
 
 
 def management():

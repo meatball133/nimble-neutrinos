@@ -11,6 +11,7 @@ styles %}
             <div id="installed-on-list">
                 {% for guild in installed_guilds %}
                     <div class="server">
+                        <span class="server-id">{{ guild.id }}</span>
                         <img class="server-image"
                              src="https://cdn.discordapp.com/icons/{{ guild.id }}/{{ guild.icon }}">
                         <span class="server-name">{{ guild.name }}</span>

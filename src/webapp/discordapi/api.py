@@ -46,3 +46,11 @@ class DiscordApi:
         response = self.rsession.get(self.base_url + '/users/@me/guilds', headers=headers)
         response.raise_for_status()
         return response.json()
+
+    def get_channel_info(self, channel_id: str) -> dict:
+        headers = {
+            'Authorization': f"Bot {getenv('BOT_TOKEN')}",
+        }
+        response = self.rsession.get(self.base_url + f'/channels/{channel_id}', headers=headers)
+        response.raise_for_status()
+        return response.json()
