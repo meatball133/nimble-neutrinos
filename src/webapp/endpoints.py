@@ -1,6 +1,7 @@
 from os import getenv
 
-from flask import request, render_template, session, redirect, url_for, abort
+from flask import request, render_template, session, redirect, url_for, abort, jsonify
+
 from src.webapp import db, discord_api
 
 
@@ -12,8 +13,43 @@ def gallery():
     return render_template("gallery.j2")
 
 
+def server_channels():
+    server_id = request.args.get("server_id")
+    server = db.get_server_by_discord_id(server_id)
+    channels = db.get_channels_in_server(server.id)
+    channels_json = []
+    for channel in channels:
+        channel_info = discord_api.get_channel_info(channel.discord_id)
+        channels_json.append({
+            "id": channel.id,
+            "enabled": channel.enabled,
+            "name": channel_info["name"],
+        })
+    return jsonify(channels_json)
+
+
+def update_channel():
+    data = request.get_json()
+    channel = db.get_channel_by_id(data["id"])
+    db.update_channel(data["id"], discord_id=channel.discord_id, enabled=data["new_state"], server_id=channel.server_id)
+    return ""
+
+
 def management():
-    return render_template("management.j2")
+    user = db.get_user_by_id(session['user_id'])
+    user_guilds = discord_api.get_user_guilds(user.access_token)
+    user_managed_guilds = [guild for guild in user_guilds if int(guild["permissions"]) & 32]
+    print(user_managed_guilds)
+    user_installed_guilds = []
+    user_installable_guilds = []
+    for guild in user_managed_guilds:
+        guild_in_db = db.get_server_by_discord_id(guild["id"])
+        if guild_in_db is None:
+            user_installable_guilds.append(guild)
+        else:
+            user_installed_guilds.append(guild)
+    return render_template("management.j2", installable_guilds=user_installable_guilds,
+                           installed_guilds=user_installed_guilds)
 
 
 def login():

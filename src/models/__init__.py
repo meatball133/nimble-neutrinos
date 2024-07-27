@@ -1,13 +1,15 @@
-from src.config.db import get_session, Base, engine
-from src.models.message import Message
-from src.models.tags import Tag
-from src.models.user import User
+from typing import NoReturn
+
+from sqlalchemy import select, ScalarResult
+
+from src.config.db import get_session
 from src.models.attachment import Attachment
 from src.models.channel import Channel
+from src.models.message import Message
 from src.models.server import Server
+from src.models.tags import Tag
+from src.models.user import User
 
-from sqlalchemy import select
-from typing import List, NoReturn
 
 class Model:
     def __init__(self):
@@ -40,7 +42,7 @@ class Model:
 
         stmt = select(Tag)
         return self.session.scalars(stmt)
-    
+
     def get_tag_by_id(self, id: int) -> Tag:
         """
         Get a tag by its id.
@@ -54,7 +56,7 @@ class Model:
 
         stmt = select(Tag).where(Tag.id == id)
         return self.session.scalars(stmt).one()
-    
+
     def create_tag(self, name: str) -> int:
         """
         Create a new tag.
@@ -70,7 +72,7 @@ class Model:
         self.session.add(new_tag)
         self.session.commit()
         return new_tag.id
-    
+
     def update_tag(self, id: int, name: str) -> NoReturn:
         """
         Update a tag.
@@ -111,7 +113,7 @@ class Model:
     def get_user_by_discord_id(self, discord_id: int) -> User:
         stmt = select(User).where(User.discord_id == discord_id)
         return self.session.scalars(stmt).one_or_none()
-    
+
     def get_user_by_id(self, id: int) -> User:
         """
         Get a user by its id.
@@ -125,7 +127,7 @@ class Model:
 
         stmt = select(User).where(User.id == id)
         return self.session.scalars(stmt).one()
-    
+
     def create_user(self, discord_id: int, access_token: str, refresh_token: str) -> User:
         """
         Create a new user.
@@ -143,7 +145,7 @@ class Model:
         self.session.add(new_user)
         self.session.commit()
         return new_user
-    
+
     def update_user(self, id: int, discord_id: int, access_token: str, refresh_token: str) -> NoReturn:
         """
         Update a user.
@@ -185,7 +187,7 @@ class Model:
 
         stmt = select(Message)
         return self.session.scalars(stmt)
-    
+
     def get_message_by_id(self, id: int) -> Message:
         """
         Get a message by its id.
@@ -200,7 +202,11 @@ class Model:
         stmt = select(Message).where(Message.id == id)
         return self.session.scalars(stmt).one()
 
-    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag]) -> int:
+    def get_message_by_discord_id(self, discord_id: int) -> Message:
+        stmt = select(Message).where(Message.discord_id == discord_id)
+        return self.session.scalars(stmt).one_or_none()
+
+    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag]) -> Message:
         """
         Create a new message.
 
@@ -218,8 +224,7 @@ class Model:
 
         self.session.add(new_message)
         self.session.commit()
-        return new_message.id
-    
+        return new_message
 
     def update_message(self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[Tag]) -> NoReturn:
         """
@@ -264,7 +269,7 @@ class Model:
 
         stmt = select(Attachment)
         return self.session.scalars(stmt)
-    
+
     def get_attachment_by_id(self, id: int) -> Attachment:
         """
         Get an attachment by its id.
@@ -278,7 +283,7 @@ class Model:
 
         stmt = select(Attachment).where(Attachment.id == id)
         return self.session.scalars(stmt).one()
-    
+
     def create_attachment(self, discord_id: int, message_id: int) -> int:
         """
         Create a new attachment.
@@ -295,7 +300,7 @@ class Model:
         self.session.add(new_attachment)
         self.session.commit()
         return new_attachment.id
-    
+
     def update_attachment(self, id: int, discord_id: int, message_id: int) -> NoReturn:
         """
         Update an attachment.
@@ -325,7 +330,7 @@ class Model:
         self.session.delete(attachment)
         self.session.commit()
 
-    def get_channels(self) -> list[Channel]:
+    def get_channels(self) -> ScalarResult[Channel]:
         """
         Get all channels from the database.
 
@@ -335,7 +340,11 @@ class Model:
 
         stmt = select(Channel)
         return self.session.scalars(stmt)
-    
+
+    def get_channels_in_server(self, server_id: int) -> ScalarResult[Channel]:
+        stmt = select(Channel).where(Channel.server_id == server_id)
+        return self.session.scalars(stmt)
+
     def get_channel_by_id(self, id: int) -> Channel:
         """
         Get a channel by its id.
@@ -349,25 +358,26 @@ class Model:
 
         stmt = select(Channel).where(Channel.id == id)
         return self.session.scalars(stmt).one()
-    
-    def create_channel(self, discord_id: int, enabled: bool, server_id: int) -> int:
+
+    def get_channel_by_discord_id(self, discord_id: int) -> Channel:
+        stmt = select(Channel).where(Channel.discord_id == discord_id)
+        return self.session.scalars(stmt).one_or_none()
+
+    def create_channel(self, discord_id: int, enabled: bool, server_id: int) -> Channel:
         """
-        Create a new channel.
+        Create a new server.
 
         Args:
-            discord_id (int): The discord id of the channel.
-            enabled (bool): Whether the channel should be checked for messages.
-            server_id (int): The server id of the channel.
+            discord_id (int): The discord id of the server.
 
         Returns:
-            int: The id of the new channel
+            int: The id of the new server.
         """
-
         new_channel = Channel(discord_id=discord_id, enabled=enabled, server_id=server_id)
         self.session.add(new_channel)
         self.session.commit()
-        return new_channel.id
-    
+        return new_channel
+
     def update_channel(self, id: int, discord_id: int, enabled: bool, server_id: int) -> NoReturn:
         """
         Update a channel.
@@ -423,8 +433,12 @@ class Model:
 
         stmt = select(Server).where(Server.id == id)
         return self.session.scalars(stmt).one()
-    
-    def create_server(self, discord_id: int) -> int:
+
+    def get_server_by_discord_id(self, discord_id: int) -> Server:
+        stmt = select(Server).where(Server.discord_id == discord_id)
+        return self.session.scalars(stmt).one_or_none()
+
+    def create_server(self, discord_id: int) -> Server:
         """
         Create a new server.
 
@@ -434,12 +448,11 @@ class Model:
         Returns:
             int: The id of the new server.
         """
-
         new_server = Server(discord_id=discord_id)
         self.session.add(new_server)
         self.session.commit()
-        return new_server.id
-    
+        return new_server
+
     def update_server(self, id: int, discord_id: int) -> NoReturn:
         """
         Update a server.

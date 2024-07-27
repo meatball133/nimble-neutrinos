@@ -5,15 +5,15 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from cogs import ALL_EXTENSIONS
-from main import NimbleNeutrinos
+from src.bot.cogs import ALL_EXTENSIONS
+from src.bot.main import CordPicsBot
 
 
 class OwnerOnly(commands.Cog):
     """Bot owner commands"""
 
     async def interaction_check(
-        self, interaction: discord.Interaction[NimbleNeutrinos]
+        self, interaction: discord.Interaction[CordPicsBot]
     ) -> bool:
         return await interaction.client.is_owner(interaction.user)
 
