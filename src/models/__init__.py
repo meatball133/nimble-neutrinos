@@ -6,7 +6,7 @@ from src.models.attachment import Attachment
 from src.models.channel import Channel
 from src.models.server import Server
 
-from sqlalchemy import select
+from sqlalchemy import select, ScalarResult
 from typing import List, NoReturn
 
 class Model:
@@ -325,7 +325,7 @@ class Model:
         self.session.delete(attachment)
         self.session.commit()
 
-    def get_channels(self) -> list[Channel]:
+    def get_channels(self) -> ScalarResult[Channel]:
         """
         Get all channels from the database.
 
@@ -335,7 +335,11 @@ class Model:
 
         stmt = select(Channel)
         return self.session.scalars(stmt)
-    
+
+    def get_channels_in_server(self, server_id: int) -> ScalarResult[Channel]:
+        stmt = select(Channel).where(Channel.server_id == server_id)
+        return self.session.scalars(stmt)
+
     def get_channel_by_id(self, id: int) -> Channel:
         """
         Get a channel by its id.

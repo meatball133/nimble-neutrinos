@@ -44,6 +44,15 @@ class CordPicsBot(commands.Bot):
         for channel in guild.text_channels:
             self.db.create_channel(discord_id=channel.id, enabled=False, server_id=server.id)
 
+    async def on_guild_remove(self, guild: discord.Guild):
+        print(f"Removed from server {guild.name} (ID: {guild.id}).")
+        server = self.db.get_server_by_discord_id(guild.id)
+        channels_to_remove = self.db.get_channels_in_server(server.id)
+        for channel in channels_to_remove:
+            self.db.delete_channel(channel.id)
+        self.db.delete_server(server.id)
+
+
     async def setup_hook(self) -> None:
         results = await asyncio.gather(
             *(self.load_extension(ext) for ext in cogs.INITIAL_EXTENSIONS),
