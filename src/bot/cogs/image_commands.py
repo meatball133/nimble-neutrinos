@@ -1,14 +1,74 @@
-from asyncpg.connection import asyncpg
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 from asyncpg import Pool
 
-from cogs import ALL_MODULES
 from main import NimbleNeutrinos
-
 import config
+
+
+class Image:
+    id: str
+    user: discord.User
+    tags: list[str]
+    src: str
+
+    def __init__(self, id: str, user: discord.User, tags: [str], src: str) -> None:
+        self.id = id
+        self.user = user
+        self.tags = tags
+        self.src = src
+
+    def get_embed(self) -> discord.Embed:
+        embed = discord.Embed()
+
+        embed.set_author(name=self.user.name)
+        embed.add_field(name="Tags", value=f"*{", ".join(self.tags)}*")
+        embed.set_image(url=self.src)
+
+        return embed
+
+
+class ImageSwitcher(discord.ui.View):
+    cur_image: int = 0
+    image_count: int
+    interaction: discord.Interaction
+    images: list[Image]
+
+    def __init__(self, images: list[Image], ctx: commands.Context, timeout: float = 300.0):
+        self.images = images
+        self.image_count = len(images)
+        self.interaction = ctx.interaction
+        super().__init__(timeout=timeout)
+
+    async def send_message(self):
+        await self.interaction.response.send_message(
+            embed=self.images[self.cur_image].get_embed(),
+            view=self,
+        )
+
+    async def _edit_message(self):
+        await self.interaction.edit_original_response(
+            embed=self.images[self.cur_image].get_embed(),
+            view=self,
+        )
+
+    @discord.ui.button(label="View on Web", style=discord.ButtonStyle.green)
+    async def web_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass  # This function should redirect the user to the web page of the image
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.blurple)
+    async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.cur_image = (self.cur_image - 1) % self.image_count
+        await self._edit_message()
+        await interaction.response.defer()
+
+    @discord.ui.button(label="Forward", style=discord.ButtonStyle.blurple)
+    async def forward(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.cur_image = (self.cur_image + 1) % self.image_count
+        await self._edit_message()
+        await interaction.response.defer()
 
 
 class ImageCommands(commands.Cog):
@@ -35,7 +95,7 @@ class ImageCommands(commands.Cog):
 
         return attachments[0]
 
-    # TODO: Make the SQL request work (insert image with tags into database) and return appropriate boolean
+    # TODO: Make this SQL request work (insert image with tags into database) and return appropriate boolean
     async def _post_data(self, ctx: commands.Context, url: str, tag: list[str]):
         db_response = await self.db_pool.execute(f"""
             INSERT INTO {config.DB().DATABASE}
@@ -71,6 +131,30 @@ class ImageCommands(commands.Cog):
 
         await ctx.reply(embed=embed)
 
+    # TODO: Make this SQL request work too (get all images in the channel with the given tags and/or from given user)
+    # and return a list of Image objects
+    async def _query_images(self, user: str | None, tags: str | None) -> list[Image]:
+        db_response = self.db_pool.fetch(f"""
+        SELECT * FROM {config.DB().DATABASE}
+        """)
 
-async def setup(bot):
-    await bot.add_cog(ImageCommands(bot), bot.pool)
+        return []
+
+    @app_commands.command(
+        name="search",
+        description="Search for image using tags (searches through current channel).",
+    )
+    @app_commands.describe(
+        tags="Space separated list of tags to search for (optional)",
+        user="Username of the poster of the image (optional)",
+    )
+    async def search(self, ctx: commands.Context, tags: str | None, user: str | None = None):
+        tag_list = (tags if tags else "").split()
+        images: list[Image] = await self._query_images(user, tags)
+
+        view = ImageSwitcher(images, ctx)
+        await view.send_message()
+
+
+async def setup(bot: NimbleNeutrinos):
+    await bot.add_cog(ImageCommands(bot, bot.pool))
