@@ -1,4 +1,4 @@
-from config.db import get_session
+from src.config.db import get_session
 from .message import Message
 from .tags import Tag
 from .user import User
@@ -129,11 +129,11 @@ class Model:
         stmt = select(Channel).where(Channel.id == id)
         return self.session.scalars(stmt).one()
     
-    def create_channel(self, discord_id: int, enabled: bool, server_id: int) -> int:
+    def create_channel(self, discord_id: int, enabled: bool, server_id: int) -> Channel:
         new_channel = Channel(discord_id=discord_id, enabled=enabled, server_id=server_id)
         self.session.add(new_channel)
         self.session.commit()
-        return new_channel.id
+        return new_channel
     
     def update_channel(self, id: int, discord_id: int, enabled: bool, server_id: int) -> NoReturn:
         stmt = select(Channel).where(Channel.id == id)
@@ -157,11 +157,11 @@ class Model:
         stmt = select(Server).where(Server.id == id)
         return self.session.scalars(stmt).one()
     
-    def create_server(self, discord_id: int) -> int:
+    def create_server(self, discord_id: int) -> Server:
         new_server = Server(discord_id=discord_id)
         self.session.add(new_server)
         self.session.commit()
-        return new_server.id
+        return new_server
     
     def update_server(self, id: int, discord_id: int) -> NoReturn:
         stmt = select(Server).where(Server.id == id)
