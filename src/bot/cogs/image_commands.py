@@ -157,4 +157,4 @@ class ImageCommands(commands.Cog):
 
 
 async def setup(bot: NimbleNeutrinos):
-    await bot.add_cog(ImageCommands(bot, bot.pool))
+    await bot.add_cog(ImageCommands(bot))
