@@ -62,9 +62,6 @@ input:-webkit-autofill:active {
     margin-left: 10px;
 }
 
-#login-button-container {
-    
-}
 
 #login-button {
     color: var(--text-color);
