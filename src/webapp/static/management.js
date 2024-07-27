@@ -75,7 +75,7 @@ function loadData(serversAndChannels) {
 }
 
 window.addEventListener("load", e => {
-    loadData(testChannels);
+    // loadData(testChannels);
 });
 
 
