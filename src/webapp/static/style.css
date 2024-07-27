@@ -222,3 +222,21 @@ h1 {
 #welcome-text {
     font-size: 2rem;
 }
+
+noscript {
+    position: absolute;
+    background: black;
+    z-index: 999999999;
+    width: 100%;
+    height: 100%;
+    align-content: center;
+}
+
+noscript span {
+    text-align: center;
+    vertical-align: center;
+    width: 100%;
+    height: 100%;
+    margin-left: 50%;
+    color: white;
+}
