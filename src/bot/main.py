@@ -6,6 +6,7 @@ from discord.ext import commands
 
 import cogs
 import config
+from src.bot.helpers import is_media_attachment
 from src.models import Model
 
 
@@ -52,6 +53,21 @@ class CordPicsBot(commands.Bot):
             self.db.delete_channel(channel.id)
         self.db.delete_server(server.id)
 
+    async def on_message(self, message: discord.Message):
+        channel = self.db.get_channel_by_discord_id(message.channel.id)
+        if not channel.enabled:
+            return
+        if not message.attachments:
+            return
+        media_attachments = [attachment for attachment in message.attachments if is_media_attachment(attachment)]
+        if not media_attachments:
+            return
+        user = self.db.get_user_by_discord_id(message.author.id)
+        if user is None:
+            user = self.db.create_user(message.author.id, "", "")
+        message_in_db = self.db.create_message(message.id, channel.id, user.id, [])
+        for attachment in media_attachments:
+            self.db.create_attachment(attachment.id, message_in_db.id)
 
     async def setup_hook(self) -> None:
         results = await asyncio.gather(
