@@ -1,0 +1,128 @@
+body {
+    height: 100vh;
+    max-height: 100vh;
+}
+
+h2 {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+main {
+    flex-grow: 1;
+    display: flex;
+}
+
+#management-container {
+    display: grid;
+    grid-template-areas: "installed-on channels"
+                         "installable-on channels";
+    width: 100%;
+    border-radius: 25px;
+    background: var(--filter-color);
+    border: 3px solid black;
+    margin: 10px 0;
+    grid-auto-flow: dense;
+}
+
+#installed-on {
+    grid-area: installed-on;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#installable-on {
+    grid-area: installable-on;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+#channels {
+    grid-area: channels;
+    border-left: 3px solid black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#install-button {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    border-radius: 15px;
+    padding: 5px 10px;
+    width: 80%;
+    font-size: 1em;
+    margin: 5px 0;
+}
+
+#installed-on-text,
+#installable-on-text {
+    text-align: center;
+    margin-top: 10px;
+    padding-bottom: 10px;
+    width: 100%;
+    border-bottom: 2px solid black;
+    margin-bottom: 0;
+}
+
+#installed-on-list,
+#installable-on-list {
+    display: inline-block;
+    width: 100%;
+}
+
+#installable-on-list {
+    flex-grow: 1;
+}
+
+.server {
+    display: flex;
+    padding: 5px;
+    align-items: center;
+    border-bottom: 1px solid black;
+}
+
+
+.server-name {
+    width: 100%;
+    display: flex;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.server:hover {
+    background-color: #424549;
+}
+
+.server-arrow {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    border-right: 3px solid black;
+    border-top: 3px solid #000000;
+    transform: rotate(45deg);
+    margin-right: 10px;
+}
+
+.server-image {
+    height: 1.8rem;
+    border-radius: 50%;
+}
+
+.current-installable-server,
+.current-server {
+    background-color: #424549;
+}
+
+#channels-list {
+    background-color: #424549;
+    width: 95%;
+    border-radius: 20px;
+    height: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    overflow-y: auto;
+}
