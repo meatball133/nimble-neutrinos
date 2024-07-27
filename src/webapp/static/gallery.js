@@ -509,11 +509,28 @@ function addChannels(channels) {
     }
 }
 
+const sentinel = document.getElementById("sentinel");
+
 window.addEventListener("load", (e) => {
     // Todo: Implement get data and channels
     addData(testData);
-    addChannels(testChannels)
+    addChannels(testChannels);
+
+    let intersectionObserver = new IntersectionObserver(entries => {
+
+    
+        if (entries[0].intersectionRatio <= 0) {
+          return;
+        }
+    
+        // Load data
+    
+    });
+    
+    intersectionObserver.observe(sentinel);
+    
 });
+
 
 // Test data below
 
