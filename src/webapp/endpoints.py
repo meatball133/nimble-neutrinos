@@ -1,3 +1,5 @@
+from os import getenv
+
 from flask import request, render_template, session, redirect, url_for, abort
 from src.webapp import db, discord_api
 
@@ -34,3 +36,7 @@ def authorizer():
     session["user_name"] = user_info['username']
     session["user_avatar"] = user_info['avatar']
     return redirect(url_for("mainpage"))
+
+
+def install_redirect():
+    return redirect(f"https://discord.com/oauth2/authorize?client_id={getenv("CLIENT_ID")}")
