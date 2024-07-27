@@ -1,8 +1,8 @@
 from os import getenv
 
+from dotenv import load_dotenv
 from flask import url_for
 from requests import Session
-from dotenv import load_dotenv
 from requests.auth import HTTPBasicAuth
 
 
@@ -27,7 +27,7 @@ class DiscordApi:
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
         }
-        response = self.rsession.post(self.base_url+'/oauth2/token', data=data, headers=headers, auth=self.auth)
+        response = self.rsession.post(self.base_url + '/oauth2/token', data=data, headers=headers, auth=self.auth)
         response.raise_for_status()
         return response.json()
 
@@ -35,8 +35,14 @@ class DiscordApi:
         headers = {
             "Authorization": f"Bearer {token}"
         }
-        print(headers)
-        response = self.rsession.get(self.base_url+'/users/@me', headers=headers)
-        print(response.request.headers)
+        response = self.rsession.get(self.base_url + '/users/@me', headers=headers)
+        response.raise_for_status()
+        return response.json()
+
+    def get_user_guilds(self, token: str) -> list[dict]:
+        headers = {
+            'Authorization': f"Bearer {token}"
+        }
+        response = self.rsession.get(self.base_url + '/users/@me/guilds', headers=headers)
         response.raise_for_status()
         return response.json()

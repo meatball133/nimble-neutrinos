@@ -423,6 +423,10 @@ class Model:
 
         stmt = select(Server).where(Server.id == id)
         return self.session.scalars(stmt).one()
+
+    def get_server_by_discord_id(self, discord_id: int) -> Server:
+        stmt = select(Server).where(Server.discord_id == discord_id)
+        return self.session.scalars(stmt).one_or_none()
     
     def create_server(self, discord_id: int) -> int:
         """

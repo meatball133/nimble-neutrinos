@@ -8,11 +8,28 @@ styles %}
     <section id="management-container">
         <div id="installed-on">
             <h3 id="installed-on-text">Installed On</h3>
-            <div id="installed-on-list"></div>
+            <div id="installed-on-list">
+                {% for guild in installed_guilds %}
+                    <div class="server">
+                        <img class="server-image"
+                             src="https://cdn.discordapp.com/icons/{{ guild.id }}/{{ guild.icon }}">
+                        <span class="server-name">{{ guild.name }}</span>
+                        <div class="server-arrow"></div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
         <div id="installable-on">
             <h3 id="installable-on-text">Installable On</h3>
-            <div id="installable-on-list"></div>
+            <div id="installable-on-list">
+                {% for guild in installable_guilds %}
+                    <div class="server">
+                        <img class="server-image"
+                             src="https://cdn.discordapp.com/icons/{{ guild.id }}/{{ guild.icon }}">
+                        <span class="server-name">{{ guild.name }}</span>
+                    </div>
+                {% endfor %}
+            </div>
             <a href="{{ url_for('install_redirect') }}" id="install-button-container">
                 <button id="install-button">Install</button>
             </a>

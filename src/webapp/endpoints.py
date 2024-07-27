@@ -1,6 +1,7 @@
 from os import getenv
 
 from flask import request, render_template, session, redirect, url_for, abort
+
 from src.webapp import db, discord_api
 
 
@@ -13,7 +14,20 @@ def gallery():
 
 
 def management():
-    return render_template("management.j2")
+    user = db.get_user_by_id(session['user_id'])
+    user_guilds = discord_api.get_user_guilds(user.access_token)
+    user_managed_guilds = [guild for guild in user_guilds if int(guild["permissions"]) & 32]
+    print(user_managed_guilds)
+    user_installed_guilds = []
+    user_installable_guilds = []
+    for guild in user_managed_guilds:
+        guild_in_db = db.get_server_by_discord_id(guild["id"])
+        if guild_in_db is None:
+            user_installable_guilds.append(guild)
+        else:
+            user_installed_guilds.append(guild)
+    return render_template("management.j2", installable_guilds=user_installable_guilds,
+                           installed_guilds=user_installed_guilds)
 
 
 def login():
