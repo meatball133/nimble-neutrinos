@@ -7,13 +7,16 @@ def home():
     """Renders home page"""
     return render_template("index.html")
 
-@app.route("/edit-tags/<int:post_id>")
-def edit_tags(post_id: int):
-    """Renders edit post tags page
-    
-    Still needs to be implemented
+@app.route("/gallery")
+def gallery():
+    """Renders gallery page"""
+    return render_template("gallery.html")
+
+@app.route("/management")
+def management():
+    """Renders management page
     """
-    return f"Editing tags of post with post_id: {post_id}"
+    return render_template("management.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
