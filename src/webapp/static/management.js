@@ -71,7 +71,6 @@ function loadData(serversAndChannels) {
 }
 
 function updateChannel(channelID, newState) {
-    console.log(channelID, newState);
     fetch(`/updatechannel`, {
         method: "POST",
         body: JSON.stringify({
