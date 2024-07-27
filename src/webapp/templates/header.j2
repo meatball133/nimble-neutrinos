@@ -1,9 +1,9 @@
 {% block header %}
     <header>
         <h1 id="page-title">CordPics</h1>
-        {% if user %}
-            <span id="username">{{ user.username }}</span>
-            <img src="{{ user.avatar_url }}" alt="Avatar">
+        {% if session['user_id'] %}
+            <span id="username">{{ session['user_name'] }}</span>
+            <img src="https://cdn.discordapp.com/avatars/{{ session['user_discord_id'] }}/{{ session['user_avatar'] }}.png" alt="Avatar">
         {% else %}
             <a href="{{ url_for('login') }}">
                 <button id="login-button">Login</button>

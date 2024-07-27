@@ -16,7 +16,7 @@ def management():
 
 def login():
     if session.get("user_id") is not None:
-        return redirect(url_for("main.mainpage"))
+        return redirect(url_for("mainpage"))
     return redirect(discord_api.oauth_url)
 
 
@@ -30,4 +30,7 @@ def authorizer():
     if user is None:
         user = db.create_user(int(user_info["id"]), api_tokens["access_token"], api_tokens["refresh_token"])
     session["user_id"] = user.id
-    return "chuj"
+    session["user_discord_id"] = user.discord_id
+    session["user_name"] = user_info['username']
+    session["user_avatar"] = user_info['avatar']
+    return redirect(url_for("mainpage"))
