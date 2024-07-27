@@ -1,13 +1,9 @@
 import asyncio
-import logging
-import os
-from typing import Any, Type
 from aiohttp import ClientSession
-
-import asyncpg
 import config
 import discord
 from discord.ext import commands
+from src.models import Model
 
 import cogs
 
@@ -18,7 +14,7 @@ class NimbleNeutrinos(commands.Bot):
     def __init__(
         self,
         *args,
-        db_pool: asyncpg.Pool,
+        db: Model,
         session: ClientSession,
         **kwargs,
     ):
@@ -35,7 +31,7 @@ class NimbleNeutrinos(commands.Bot):
             owner_ids=config.OWNER_IDS,
         )
 
-        self.pool = db_pool
+        self.db = db
         self.session = session
 
     async def on_ready(self):
@@ -52,18 +48,14 @@ class NimbleNeutrinos(commands.Bot):
 
 
 async def main():
-    pool = asyncpg.create_pool(
-        dsn=config.DB().DSN,
-        command_timeout=60,
-        max_inactive_connection_lifetime=0,
-    )
+    model = Model()
     session = ClientSession()
     bot = NimbleNeutrinos(
-        db_pool=pool,
+        db=model,
         session=session,
     )
 
-    async with session, pool, bot:
+    async with session, model, bot:
         if config.TESTING_MODE is True:
             await bot.start(config.TESTING_BOT_TOKEN)
         else:
