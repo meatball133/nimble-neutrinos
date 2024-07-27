@@ -28,6 +28,13 @@ def server_channels():
     return jsonify(channels_json)
 
 
+def update_channel():
+    data = request.get_json()
+    channel = db.get_channel_by_id(data["id"])
+    db.update_channel(data["id"], discord_id=channel.discord_id, enabled=data["new_state"], server_id=channel.server_id)
+    return ""
+
+
 def management():
     user = db.get_user_by_id(session['user_id'])
     user_guilds = discord_api.get_user_guilds(user.access_token)

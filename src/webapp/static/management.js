@@ -70,6 +70,20 @@ function loadData(serversAndChannels) {
     }
 }
 
+function updateChannel(channelID, newState) {
+    console.log(channelID, newState);
+    fetch(`/updatechannel`, {
+        method: "POST",
+        body: JSON.stringify({
+            "id": channelID,
+            "new_state": newState,
+        }),
+        headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    })
+}
+
 function loadChannelList(serverID) {
     channelsList.innerHTML = "";
     fetch(`/channels?server_id=${serverID}`).then(response => response.json()).then(data => {
@@ -81,6 +95,7 @@ function loadChannelList(serverID) {
             channelCheckbox.type = "checkbox";
             channelCheckbox.checked = channel.enabled;
             channelCheckbox.addEventListener("change", e => {
+                updateChannel(channel.id, e.target.checked);
             });
             channelElement.appendChild(channelCheckbox);
             channelElement.appendChild(channelText);
