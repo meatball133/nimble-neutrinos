@@ -8,7 +8,7 @@ from src.models import Model
 import cogs
 
 
-class NimbleNeutrinos(commands.Bot):
+class CordPicsBot(commands.Bot):
     """A single-line docstring giving a brief description of the bot"""
 
     def __init__(
@@ -50,7 +50,7 @@ class NimbleNeutrinos(commands.Bot):
 async def main():
     model = Model()
     session = ClientSession()
-    bot = NimbleNeutrinos(
+    bot = CordPicsBot(
         db=model,
         session=session,
     )
