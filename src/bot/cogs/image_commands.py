@@ -91,9 +91,9 @@ class ImageCommands(commands.Cog):
 
             i += 1
 
-        return message
+        return None if i == len(messages) else message
 
-    def _post_data(self, ctx: commands.Context, message: discord.Message, tags: list[str]):
+    def _post_tags(self, ctx: commands.Context, message: discord.Message, tags: list[str]):
         tag_objects: list[models.Tag] = []
 
         for tag in tags:
@@ -108,18 +108,22 @@ class ImageCommands(commands.Cog):
 
             tag_objects.append(new_tag)
 
-        message_id = self.db.create_message(
-            discord_id=message.id,
-            channel_id=ctx.channel.id,
-            user_id=ctx.author.id,
+        db_message: models.Message = self.db.get_message_by_discord_id(message.id)
+
+        self.db.update_message(
+            id=db_message.id,
+            discord_id=db_message.discord_id,
+            channel_id=db_message.channel_id,
+            user_id=db_message.user_id,
             tags=tag_objects,
+            favorite=db_message.favorite,
         )
 
         for attachment in message.attachments:
             if attachment.content_type.startswith("image"):
                 self.db.create_attachment(
                     discord_id=attachment.id,
-                    message_id=message_id,
+                    message_id=db_message.id,
                 )
 
     @app_commands.command(
@@ -144,7 +148,7 @@ class ImageCommands(commands.Cog):
         embed: discord.Embed
 
         try:
-            self._post_data(ctx, image_message, tag_list)
+            self._post_tags(ctx, image_message, tag_list)
 
             embed = discord.Embed(
                 title="Image(s) Added!",

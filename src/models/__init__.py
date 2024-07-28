@@ -217,6 +217,20 @@ class Model:
         stmt = select(Message).where(Message.id == id)
         return self.session.scalars(stmt).one()
 
+    def get_message_by_discord_id(self, discord_id: int) -> Message:
+        """
+        Get a message by its discord id.
+
+        Args:
+            discord_id (int): The discord id of the message.
+
+        Returns:
+            Message: The message with the given discord id.
+        """
+
+        stmt = select(Message).where(Message.discord_id == discord_id)
+        return self.session.scalars(stmt).one()
+
     def get_messages_by_tags(self, tags: list[Tag], channel_id: int) -> list[Message]:
         """
         Get messages that contain one or more of the given tags.
@@ -233,15 +247,14 @@ class Model:
 
         # Create a statement to select messages
         stmt = (
-            select(Message)
-            .distinct()
-            .select_from(Tag)
-            .filter(Tag.id.in_(tag_ids), Message.channel_id == channel_id)
+            select(Message).distinct().select_from(Tag).filter(Tag.id.in_(tag_ids), Message.channel_id == channel_id)
         )
 
         return list(self.session.scalars(stmt))
 
-    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite: list[User] = []) -> int:
+    def create_message(
+        self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite: list[User] = []
+    ) -> int:
         """
         Create a new message.
 
@@ -254,14 +267,18 @@ class Model:
         Returns:
             int: The id of the new message
         """
-      
-        new_message = Message(discord_id=discord_id, channel_id=channel_id, user_id=user_id, tags=tags, favorite=favorite)
+
+        new_message = Message(
+            discord_id=discord_id, channel_id=channel_id, user_id=user_id, tags=tags, favorite=favorite
+        )
 
         self.session.add(new_message)
         self.session.commit()
         return new_message.id
 
-    def update_message(self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite: list[User] = []) -> NoReturn:
+    def update_message(
+        self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite: list[User] = []
+    ) -> NoReturn:
         """
         Update a message.
 
@@ -507,4 +524,3 @@ class Model:
         server = self.session.scalar(stmt)
         self.session.delete(server)
         self.session.commit()
-
