@@ -241,7 +241,7 @@ class Model:
 
         return list(self.session.scalars(stmt))
 
-    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite: bool = False) -> int:
+    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite: list[User] = []) -> int:
         """
         Create a new message.
 
@@ -261,7 +261,7 @@ class Model:
         self.session.commit()
         return new_message.id
 
-    def update_message(self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite : bool = False) -> NoReturn:
+    def update_message(self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite: list[User] = []) -> NoReturn:
         """
         Update a message.
 

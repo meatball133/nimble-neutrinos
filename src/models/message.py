@@ -11,6 +11,13 @@ association_table = Table(
     Column("message_id", ForeignKey("message.id"), primary_key=True),
 )
 
+favorite_table = Table(
+    "favorite",
+    Base.metadata,
+    Column("id", ForeignKey("message.id"), primary_key=True),
+    Column("user_id", ForeignKey("user.id"), primary_key=True),
+)
+
 
 class Message(Base):
     __tablename__ = "message"
@@ -20,4 +27,4 @@ class Message(Base):
     discord_id: Mapped[int] = mapped_column()
     channel_id: Mapped[int] = mapped_column(ForeignKey("channel.id"))
     tags: Mapped[List[Tag]] = relationship(secondary=association_table)
-    favorite: Mapped[bool] = mapped_column(default=False)
+    favorite: Mapped[List[Tag]] = relationship(secondary=favorite_table)
