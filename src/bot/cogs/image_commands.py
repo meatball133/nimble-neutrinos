@@ -7,7 +7,6 @@ from asyncpg import Pool
 from discord.ui import View
 
 from main import NimbleNeutrinos
-import config
 import models
 
 
@@ -75,6 +74,17 @@ class ImageCommands(commands.Cog):
     def __init__(self, bot: NimbleNeutrinos):
         self.bot = bot
 
+    def _check_channel_enabled(self, ctx: commands.Context) -> bool:
+        db_channel = self.db.get_channel_by_discord_id(ctx.channel.id)
+        return db_channel.enabled
+
+    def _channel_disabled_embed(self) -> discord.Embed:
+        return discord.Embed(
+            color=discord.Color.red(),
+            title="This channel is disabled",
+            description="Use the /enable command to enable CordPics in this channel",
+        )
+
     async def _get_last_image(self, ctx: commands.Context) -> discord.Message | None:
         messages = ctx.channel.history(limit=50)
         message: discord.Message | None = None
@@ -134,6 +144,10 @@ class ImageCommands(commands.Cog):
     )
     @app_commands.describe(tags="Space separated list of tags")
     async def add_tags(self, ctx: commands.Context, tags: str):
+        if not self._check_channel_enabled():
+            ctx.reply(embed=self._channel_disabled_embed(), ephemeral=True)
+            return
+
         image_message: discord.Message | None = await self._get_last_image(ctx)
 
         if image_message is None:
@@ -198,6 +212,10 @@ class ImageCommands(commands.Cog):
         tags="Space separated list of tags to search for",
     )
     async def search(self, ctx: commands.Context, tags: str):
+        if not self._check_channel_enabled():
+            ctx.reply(embed=self._channel_disabled_embed(), ephemeral=True)
+            return
+
         tag_list = tags.split()
         images: list[Image] = await self._get_images_with_tags(ctx, tag_list)
 
@@ -206,6 +224,10 @@ class ImageCommands(commands.Cog):
 
     @app_commands.command(name="pics", description="View this channel's images on the cordpics website")
     async def pics(self, ctx: commands.Context):
+        if not self._check_channel_enabled():
+            ctx.reply(embed=self._channel_disabled_embed(), ephemeral=True)
+            return
+
         db_channel = self.db.get_channel_by_discord_id(ctx.channel.id)
         link = f"{getenv("HOME_URL")}/view?channel_id={db_channel.id}"
 
