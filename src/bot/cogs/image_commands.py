@@ -128,7 +128,7 @@ class ImageCommands(commands.Cog):
 
         for attachment in message.attachments:
             if attachment.content_type.startswith("image"):
-                self.model.create_attachment(
+                self.db.create_attachment(
                     discord_id=attachment.id,
                     message_id=message_id,
                 )
