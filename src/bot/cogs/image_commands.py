@@ -73,13 +73,11 @@ class ImageSwitcher(discord.ui.View):
 
 
 class ImageCommands(commands.Cog):
-    model: models.Model = models.Model()
+    db: models.Model = models.Model()
     bot: NimbleNeutrinos
-    db_pool: Pool
 
     def __init__(self, bot: NimbleNeutrinos):
         self.bot = bot
-        self.db_pool = bot.pool
 
     async def _get_last_image(self, ctx: commands.Context) -> discord.Message | None:
         messages = ctx.channel.history(limit=50)
@@ -102,7 +100,7 @@ class ImageCommands(commands.Cog):
         return message
 
     def _post_data(self, ctx: commands.Context, message: discord.Message, tags: list[str]):
-        all_tags: list[models.Tag] = self.model.get_tags()
+        all_tags: list[models.Tag] = self.db.get_tags()
         tag_objects: list[models.Tag] = []
 
         for tag in tags:
@@ -114,14 +112,14 @@ class ImageCommands(commands.Cog):
 
             new_tag: models.Tag
             if tag_index == -1:
-                tag_id = self.model.create_tag(tag)
-                new_tag = self.model.get_tag_by_id(tag_id)
+                tag_id = self.db.create_tag(tag)
+                new_tag = self.db.get_tag_by_id(tag_id)
             else:
                 new_tag = all_tags[i]
 
             tag_objects.append(new_tag)
 
-        message_id = self.model.create_message(
+        message_id = self.db.create_message(
             discord_id=message.id,
             channel_id=ctx.channel.id,
             user_id=ctx.author.id,
@@ -191,6 +189,7 @@ class ImageCommands(commands.Cog):
     )
     async def search(self, ctx: commands.Context, tags: str | None, user: str | None = None):
         tag_list = (tags if tags else "").split()
+        tag_list = [tag.lower() for tag in tag_list]
         images: list[Image] = await self._query_images(user, tags)
 
         view = ImageSwitcher(images, ctx)
