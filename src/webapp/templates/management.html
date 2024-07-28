@@ -1,0 +1,28 @@
+{% extends "base.html" %} {% block title %}Management{% endblock %} {% block
+styles %}<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='management.css') }}"
+/>
+{% endblock %} {% block content %}
+<section id="management-container">
+  <div id="installed-on">
+    <h3 id="installed-on-text">Installed On</h3>
+    <div id="installed-on-list"></div>
+  </div>
+  <div id="installable-on">
+    <h3 id="installable-on-text">Installable On</h3>
+    <div id="installable-on-list"></div>
+    <button id="install-button">Install</button>
+  </div>
+  <div id="channels">
+    <h2>Enable CordPics For These Channels</h2>
+    <div id="channels-list"></div>
+  </div>
+</section>
+
+{% endblock %} {% block scripts %}
+<script
+  src="{{ url_for('static', filename='management.js') }}"
+  type="text/javascript"
+></script>
+{% endblock %}
