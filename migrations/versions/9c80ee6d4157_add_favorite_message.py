@@ -19,8 +19,8 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    pass
+    op.add_column("message", sa.Column("favorite", sa.Boolean, default=False))
 
 
 def downgrade() -> None:
-    pass
+    op.drop_column("message", "favorite")
