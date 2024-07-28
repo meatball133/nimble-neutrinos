@@ -100,22 +100,17 @@ class ImageCommands(commands.Cog):
         return message
 
     def _post_data(self, ctx: commands.Context, message: discord.Message, tags: list[str]):
-        all_tags: list[models.Tag] = self.db.get_tags()
         tag_objects: list[models.Tag] = []
 
         for tag in tags:
-            tag_index = -1
-            for i in range(len(all_tags)):
-                if tag == all_tags[i].name:
-                    tag_index = i
-                    break
-
             new_tag: models.Tag
-            if tag_index == -1:
+            result: models.Tag | None = self.db.get_tag_by_name(tag)
+
+            if result is None:
                 tag_id = self.db.create_tag(tag)
                 new_tag = self.db.get_tag_by_id(tag_id)
             else:
-                new_tag = all_tags[i]
+                new_tag = result
 
             tag_objects.append(new_tag)
 
