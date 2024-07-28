@@ -1,0 +1,10 @@
+FROM python:3.12.4-alpine3.20
+
+RUN apk add --no-cache bash coreutils postgresql gcc libpq-dev python3-dev
+
+COPY . .
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip3 install -r requirements-dev.txt
+
+CMD ["python", "src/bot/main.py"]
