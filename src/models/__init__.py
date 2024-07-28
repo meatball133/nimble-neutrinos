@@ -196,7 +196,7 @@ class Model:
         stmt = select(Message).where(Message.id == id)
         return self.session.scalars(stmt).one()
 
-    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag]) -> int:
+    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite : bool = False) -> int:
         """
         Create a new message.
 
@@ -210,14 +210,14 @@ class Model:
             int: The id of the new message
         """
       
-        new_message = Message(discord_id=discord_id, channel_id=channel_id, user_id=user_id, tags=tags)
+        new_message = Message(discord_id=discord_id, channel_id=channel_id, user_id=user_id, tags=tags, favorite=favorite)
 
         self.session.add(new_message)
         self.session.commit()
         return new_message.id
     
 
-    def update_message(self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[Tag]) -> NoReturn:
+    def update_message(self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite : bool = False) -> NoReturn:
         """
         Update a message.
 
@@ -235,6 +235,7 @@ class Model:
         message.channel_id = channel_id
         message.user_id = user_id
         message.tags = tags
+        message.favorite = favorite
         self.session.commit()
 
     def delete_message(self, id: int) -> NoReturn:
