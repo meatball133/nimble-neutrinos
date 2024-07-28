@@ -8,10 +8,21 @@
   <div name="channel" id="channel-select">
     <div id="selected-channel">
       <img src="" alt="" id="channel-select-image" />
-      <span id="channel-select-text">All</span>
+      <span id="channel-select-text">Everything</span>
     </div>
     <div id="channel-select-items" class="channel-select-items-invisible">
-      <span class="channel-list-option current-channel">All</span>
+      <span class="channel-list-option current-channel">Everything</span>
+        {% for guild in guilds %}
+            <div class="server-option channel-list-option">
+            <img class="server-image" src="https://cdn.discordapp.com/icons/{{ guild.discord_id }}/{{ guild.icon }}" alt="Server icon">
+            <span>{{ guild.name }}</span>
+            </div>
+            {% for channel in guild.channels %}
+                <div class="channel-option channel-list-option">
+                <span>#{{ channel.name }}</span>
+                </div>
+            {% endfor %}
+        {% endfor %}
     </div>
   </div>
   <div id="search-filter">

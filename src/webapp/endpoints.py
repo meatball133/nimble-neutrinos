@@ -10,7 +10,32 @@ def mainpage():
 
 
 def gallery():
-    return render_template("gallery.j2")
+    user = db.get_user_by_id(session['user_id'])
+    user_servers = discord_api.get_user_guilds(user.access_token)
+    servers_with_pics: list[dict] = []
+    for server in user_servers:
+        server_in_db = db.get_server_by_discord_id(server["id"])
+        if server_in_db is None:
+            continue
+        channels = db.get_channels_in_server(server_in_db.id)
+        enabled_channels = [channel for channel in channels if channel.enabled]
+        if not enabled_channels:
+            continue
+        channels_json = [
+            {
+                "id": channel.id,
+                "name": discord_api.get_channel_info(channel.discord_id)["name"],
+            } for channel in enabled_channels
+        ]
+        servers_with_pics.append({
+            "id": server_in_db.id,
+            "discord_id": server_in_db.discord_id,
+            "name": server["name"],
+            "icon": server["icon"],
+            "channels": channels_json
+        })
+
+    return render_template("gallery.j2", guilds=servers_with_pics)
 
 
 def server_channels():

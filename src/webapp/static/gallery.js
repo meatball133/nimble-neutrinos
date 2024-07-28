@@ -528,7 +528,38 @@ window.addEventListener("load", (e) => {
     });
     
     intersectionObserver.observe(sentinel);
-    
+
+    document.querySelectorAll(".channel-option").forEach(element => {
+        element.addEventListener("click", e => {
+            e.target.classList.add("current-channel");
+            if (currentChannel !== e.target && currentChannel) {
+                currentChannel.classList.remove("current-channel");
+            }
+            currentChannel = e.target;
+
+            channelSelectText.textContent = e.target.textContent;
+
+            if (selectedChannel.classList.contains("server-option")) {
+                selectedChannel.classList.remove("server-option");
+                channelSelectImage.src = "";
+            }
+        })
+    })
+
+    document.querySelectorAll(".server-option").forEach(element => {
+        element.addEventListener("click", e => {
+            e.target.classList.add("current-channel");
+            if (currentChannel !== e.target && currentChannel) {
+                currentChannel.classList.remove("current-channel");
+            }
+            currentChannel = e.target;
+
+            channelSelectText.textContent = e.target.textContent;
+            selectedChannel.classList.add("server-option");
+            channelSelectImage.src = serverData.serverImage;
+        })
+    })
+
 });
 
 
@@ -602,20 +633,3 @@ const testData = [
         postId: 6,
     },
 ];
-
-let testChannels = {
-    "Server 1": {
-        serverImage: "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
-        channels: [
-            "# CH",
-            "# CH2",
-        ],
-    },
-    "Server 2": {
-        serverImage: "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
-        channels: [
-            "# Images",
-            "# Videos",
-        ],
-    }
-}
