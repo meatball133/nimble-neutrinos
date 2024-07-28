@@ -1,4 +1,4 @@
-from config.db import get_session
+from src.config.db import get_session
 from .message import Message
 from .tags import Tag
 from .user import User
@@ -41,7 +41,7 @@ class Model:
         """
 
         stmt = select(Tag)
-        return list(self.session.scalars(stmt))
+        return self.session.scalars(stmt)
 
     def get_tag_by_id(self, id: int) -> Tag:
         """
@@ -71,10 +71,7 @@ class Model:
         stmt = select(Tag).where(Tag.name == name)
         result = self.session.scalars(stmt)
 
-        try:
-            return result.one()
-        except NoResultFound:
-            return None
+        return result.one_or_none()
 
     def create_tag(self, name: str) -> int:
         """
@@ -217,20 +214,6 @@ class Model:
         stmt = select(Message).where(Message.id == id)
         return self.session.scalars(stmt).one()
 
-    def get_message_by_discord_id(self, discord_id: int) -> Message:
-        """
-        Get a message by its discord id.
-
-        Args:
-            discord_id (int): The discord id of the message.
-
-        Returns:
-            Message: The message with the given discord id.
-        """
-
-        stmt = select(Message).where(Message.discord_id == discord_id)
-        return self.session.scalars(stmt).one()
-
     def get_messages_by_tags(self, tags: list[Tag], channel_id: int) -> list[Message]:
         """
         Get messages that contain one or more of the given tags.
@@ -252,9 +235,7 @@ class Model:
 
         return list(self.session.scalars(stmt))
 
-    def create_message(
-        self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite: list[User] = []
-    ) -> int:
+    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite: bool = False) -> int:
         """
         Create a new message.
 
@@ -267,14 +248,12 @@ class Model:
         Returns:
             int: The id of the new message
         """
-
-        new_message = Message(
-            discord_id=discord_id, channel_id=channel_id, user_id=user_id, tags=tags, favorite=favorite
-        )
+      
+        new_message = Message(discord_id=discord_id, channel_id=channel_id, user_id=user_id, tags=tags, favorite=favorite)
 
         self.session.add(new_message)
         self.session.commit()
-        return new_message.id
+        return new_message
 
     def update_message(
         self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite: list[User] = []
@@ -336,6 +315,10 @@ class Model:
 
         stmt = select(Attachment).where(Attachment.id == id)
         return self.session.scalars(stmt).one()
+
+    def get_attachments_from_message(self, message_id: int) -> list[Attachment]:
+        stmt = select(Attachment).where(Attachment.message_id == message_id)
+        return self.session.scalars(stmt).all()
 
     def create_attachment(self, discord_id: int, message_id: int) -> int:
         """
@@ -420,9 +403,9 @@ class Model:
         """
 
         stmt = select(Channel).where(Channel.discord_id == discord_id)
-        return self.session.scalars(stmt).one()
+        return self.session.scalars(stmt).one_or_none()
 
-    def create_channel(self, discord_id: int, enabled: bool, server_id: int) -> int:
+    def create_channel(self, discord_id: int, enabled: bool, server_id: int) -> Channel:
         """
         Create a new channel.
 
@@ -438,7 +421,7 @@ class Model:
         new_channel = Channel(discord_id=discord_id, enabled=enabled, server_id=server_id)
         self.session.add(new_channel)
         self.session.commit()
-        return new_channel.id
+        return new_channel
 
     def update_channel(self, id: int, discord_id: int, enabled: bool, server_id: int) -> NoReturn:
         """
@@ -480,7 +463,7 @@ class Model:
         """
 
         stmt = select(Server)
-        return list(self.session.scalars(stmt))
+        return self.session.scalars(stmt)
 
     def get_server_by_id(self, id: int) -> Server:
         """
@@ -496,7 +479,11 @@ class Model:
         stmt = select(Server).where(Server.id == id)
         return self.session.scalars(stmt).one()
 
-    def create_server(self, discord_id: int) -> int:
+    def get_server_by_discord_id(self, discord_id: int) -> Server:
+        stmt = select(Server).where(Server.discord_id == discord_id)
+        return self.session.scalars(stmt).one_or_none()
+
+    def create_server(self, discord_id: int) -> Server:
         """
         Create a new server.
 
@@ -510,7 +497,7 @@ class Model:
         new_server = Server(discord_id=discord_id)
         self.session.add(new_server)
         self.session.commit()
-        return new_server.id
+        return new_server
 
     def update_server(self, id: int, discord_id: int) -> NoReturn:
         """
@@ -538,3 +525,4 @@ class Model:
         server = self.session.scalar(stmt)
         self.session.delete(server)
         self.session.commit()
+

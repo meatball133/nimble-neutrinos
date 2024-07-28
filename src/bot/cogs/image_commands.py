@@ -3,11 +3,11 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from asyncpg import Pool
 from discord.ui import View
 
-from main import NimbleNeutrinos
-import models
+from src.bot.main import CordPicsBot
+import src.bot.config
+from src import models
 
 
 class Image:
@@ -69,9 +69,9 @@ class ImageSwitcher(discord.ui.View):
 
 class ImageCommands(commands.Cog):
     db: models.Model = models.Model()
-    bot: NimbleNeutrinos
+    bot: CordPicsBot
 
-    def __init__(self, bot: NimbleNeutrinos):
+    def __init__(self, bot: CordPicsBot):
         self.bot = bot
 
     def _check_channel_enabled(self, interaction: discord.Interaction) -> bool:
@@ -132,13 +132,6 @@ class ImageCommands(commands.Cog):
             tags=tag_objects,
             favorite=db_message.favorite,
         )
-
-        for attachment in message.attachments:
-            if attachment.content_type.startswith("image"):
-                self.db.create_attachment(
-                    discord_id=attachment.id,
-                    message_id=db_message.id,
-                )
 
     @app_commands.command(
         name="addtags",
@@ -262,5 +255,5 @@ class ImageCommands(commands.Cog):
         interaction.response.send_message("CordPics has been disabled in this channel", ephemeral=True)
 
 
-async def setup(bot: NimbleNeutrinos):
+async def setup(bot: CordPicsBot):
     await bot.add_cog(ImageCommands(bot))

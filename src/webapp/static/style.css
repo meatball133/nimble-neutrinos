@@ -1,0 +1,242 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --background-color: #36393e;
+    --filter-color: #282b30;
+    --text-color: #ffffff;
+    --accent-color: #7289da;
+}
+
+body {
+    color: var(--text-color);
+    background-color: var(--background-color);
+    display: flex;
+    flex-direction: column;
+    font-family: "gg sans Normal", sans-serif;
+    margin: 0 8px;
+    min-height: 100vh;
+}
+
+header {
+    height: max(10vh, 70px);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+h1 a {
+    text-decoration: none;
+    color: var(--text-color);
+}
+
+main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+select:focus-visible,
+select:focus,
+input:focus-visible,
+input:focus {
+    outline: none;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: none !important;
+    background: transparent;
+}
+
+#profile {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#profile-picture {
+    height: 80%;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+
+
+#login-button {
+    color: var(--text-color);
+    background: var(--accent-color);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+nav {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+#nav-items {
+    display: flex;
+    flex-direction: column;
+    padding-left: 10px;
+    position: absolute;
+    top: 100%;
+    width: 97vw;
+    left: -8px;
+    background-color: var(--background-color);
+    z-index: 10;
+    margin: 0;
+    height: 0;
+    overflow: clip;
+}
+
+.nav-items-visible {
+    padding: 20px;
+    border: 2px solid black;
+    height: fit-content !important;
+}
+
+.nav-item a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 1.5rem;
+    padding: 0 10px;
+    position: relative;
+    margin: 0 10px;
+}
+
+.nav-item a::after {
+    content: "";
+    background-color: var(--text-color);
+    width: 0;
+    height: 3px;
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    border-radius: 5px;
+    transition: width 0.5s linear;
+}
+
+
+.nav-item a:hover::after {
+    width: 100%;
+}
+
+#hamburger,
+#hamburger::after,
+#hamburger::before {
+    cursor: pointer;
+    width: 40px;
+    height: 4px;
+    background-color: var(--accent-color);
+    position: relative;
+    border-radius: 3px;
+}
+
+#hamburger {
+    margin-left: 10px;
+}
+
+#hamburger::after,
+#hamburger::before {
+    content: "";
+}
+
+#hamburger::after {
+    position: absolute;
+    top: 300%;
+}
+
+#hamburger::before {
+    position: absolute;
+    bottom: 300%;
+}
+
+#header-and-hamburger {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+}
+
+h1 {
+    flex-grow: 1;
+    text-align: center;
+}
+
+#profile span {
+    display: none;;
+}
+
+@media only screen and (min-width: 481px) {
+    #profile span {
+        display: inline;
+    }
+}
+
+@media only screen and (min-width: 769px) {
+    nav {
+        flex-direction: row;
+    }
+    #nav-items {
+        flex-direction: row;
+        position: static;
+        width: auto;
+        border: none;
+        padding: 0;
+        height: fit-content;
+        margin-left: 10px;
+    }
+
+    #header-and-hamburger {
+        all: unset;
+        padding: 0 10px;
+    }
+
+    #hamburger,
+    #hamburger::after,
+    #hamburger::before {
+        all: unset;
+    }
+}
+
+#home-page-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+#tagline {
+    font-size: 4rem;
+}
+
+#welcome-text {
+    font-size: 2rem;
+}
+
+noscript {
+    position: absolute;
+    background: black;
+    z-index: 999999999;
+    width: 100%;
+    height: 100%;
+    align-content: center;
+}
+
+noscript span {
+    text-align: center;
+    vertical-align: center;
+    width: 100%;
+    height: 100%;
+    margin-left: 50%;
+    color: white;
+}
