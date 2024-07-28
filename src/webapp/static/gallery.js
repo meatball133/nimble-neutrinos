@@ -289,11 +289,13 @@ function setModal(index) {
     }
 
     for (const tag of image.dataset.tags.split(",")) {
-        let tagElement = document.createElement("span");
-        tagElement.textContent = tag;
-        tagElement.classList.add('tag');
-        tagElement.classList.add('modal-tag');
-        modalTags.appendChild(tagElement)
+        if (tag != "") {
+            let tagElement = document.createElement("span");
+            tagElement.textContent = tag;
+            tagElement.classList.add('tag');
+            tagElement.classList.add('modal-tag');
+            modalTags.appendChild(tagElement)
+        }
     }
 }
 
@@ -356,11 +358,13 @@ function addData(dataList) {
             }
 
             for (const tag of data.tags.split(",")) {
-                let tagElement = document.createElement("span");
-                tagElement.textContent = tag;
-                tagElement.classList.add('tag');
-                tagElement.classList.add('modal-tag');
-                modalTags.appendChild(tagElement)
+                if (tag != "") {
+                    let tagElement = document.createElement("span");
+                    tagElement.textContent = tag;
+                    tagElement.classList.add('tag');
+                    tagElement.classList.add('modal-tag');
+                    modalTags.appendChild(tagElement)
+                }
             }
 
 
@@ -460,7 +464,6 @@ currentChannel.addEventListener("click", e => {
 const sentinel = document.getElementById("sentinel");
 
 window.addEventListener("load", (e) => {
-    // Todo: Implement get data and channels
     // addData(testData);
 
     let intersectionObserver = new IntersectionObserver(entries => {
@@ -486,12 +489,56 @@ window.addEventListener("load", (e) => {
             selected.appendChild(e.currentTarget.cloneNode(true));
             currentChannel = e.currentTarget;
             currentChannel.classList.add("current-channel");
+            const newUrlParams = new URLSearchParams();
+            let server_id = element.querySelector(".server-id");
+            if (server_id != null) {
+                newUrlParams.set("server_id", server_id.innerText);
+            }
+            let channel_id = element.querySelector(".channel-id");
+            if (channel_id != null) {
+                newUrlParams.set("channel_id", channel_id.innerText);
+            }
+            window.history.pushState(newUrlParams.toString(), "", window.location.pathname + "?" + newUrlParams.toString());
             currentPage = 0;
             clearGallery();
             fetchData();
         })
     })
+    getChannelSelectionFromParams();
+    fetchData();
 });
+
+function getChannelSelectionFromParams() {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const serverId = urlParams.get('server_id');
+    const channelId = urlParams.get('channel_id');
+    let channelList = document.querySelector("#channel-select-items").children;
+    if (channelId != null) {
+        for (const channel of channelList) {
+            let idElement = channel.querySelector(".channel-id")
+            if (idElement == null) continue;
+            let id = idElement.innerText;
+            if (id == channelId) {
+                document.getElementById("channel-select").click();
+                channel.click();
+                return;
+            }
+        }
+    }
+    if (serverId != null) {
+        for (const channel of channelList) {
+            let idElement = channel.querySelector(".server-id")
+            if (idElement == null) continue;
+            let id = idElement.innerText;
+            if (id == serverId) {
+                document.getElementById("channel-select").click();
+                channel.click();
+                return;
+            }
+        }
+    }
+}
 
 function clearGallery() {
     document.getElementById("gallery").innerHTML = ""
@@ -519,74 +566,3 @@ function fetchData() {
     })
 }
 
-
-// Test data below
-
-const testData = [
-    {
-        image:
-            "https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187.jpg",
-        user: "Username",
-        profile:
-            "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
-        tags: "tag1,tag2,tag3,tag4",
-        postDate: "21/07/2024",
-        liked: true,
-        postId: 1,
-    },
-    {
-        image:
-            "https://www.humanesociety.org/sites/default/files/styles/400x400/public/2018/06/cat-217679.jpg",
-        user: "Username",
-        profile:
-            "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
-        tags: "tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4",
-        postDate: "21/07/2024",
-        liked: false,
-        postId: 2,
-    },
-    {
-        image:
-            "https://www.usatoday.com/gcdn/authoring/authoring-images/2023/11/02/USAT/71425480007-getty-images-1498838344.jpg?crop=1060,1413,x530,y0",
-        user: "Username",
-        profile:
-            "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
-        tags: "tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4",
-        postDate: "21/07/2024",
-        liked: false,
-        postId: 3,
-    },
-    {
-        image:
-            "https://www.alleycat.org/wp-content/uploads/2015/12/RS34996_BuenaVistaColony_1518.jpg",
-        user: "Username",
-        profile:
-            "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
-        tags: "tag1,tag2,tag3,tag4",
-        postDate: "21/07/2024",
-        liked: false,
-        postId: 4,
-    },
-    {
-        image:
-            "https://cats.com/wp-content/uploads/2024/02/96E4B546-9BE7-4977-9A29-05F2D9BB47BC_1_102_a-e1711411797978.jpeg",
-        user: "Username",
-        profile:
-            "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
-        tags: "tag1,tag2,tag3,tag4",
-        postDate: "21/07/2024",
-        liked: true,
-        postId: 5,
-    },
-    {
-        image:
-            "https://static.scientificamerican.com/sciam/cache/file/2AE14CDD-1265-470C-9B15F49024186C10_source.jpg",
-        user: "Username",
-        profile:
-            "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
-        tags: "tag1,tag2,tag3,tag4",
-        postDate: "21/07/2024",
-        liked: false,
-        postId: 6,
-    },
-];
