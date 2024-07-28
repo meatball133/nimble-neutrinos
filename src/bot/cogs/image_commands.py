@@ -217,6 +217,26 @@ class ImageCommands(commands.Cog):
 
         ctx.reply(embed=embed)
 
+    def update_channel_enabled(self, ctx: commands.Context, *, enabled: bool):
+        db_channel = self.db.get_channel_by_discord_id(ctx.channel.id)
+
+        self.db.update_channel(
+            id=db_channel.id,
+            discord_id=db_channel.discord_id,
+            enabled=enabled,
+            server_id=db_channel.server_id,
+        )
+
+    @app_commands.command(name="enable", description="Enable CordPics in this channel")
+    async def enable(self, ctx: commands.Context):
+        self.update_channel_enabled(ctx, enabled=True)
+        ctx.reply("CordPics has been enabled in this channel", ephemeral=True)
+
+    @app_commands.command(name="disable", description="Disable CordPics in this channel")
+    async def disable(self, ctx: commands.Context):
+        self.update_channel_enabled(ctx, enabled=False)
+        ctx.reply("CordPics has been disabled in this channel", ephemeral=True)
+
 
 async def setup(bot: NimbleNeutrinos):
     await bot.add_cog(ImageCommands(bot))
