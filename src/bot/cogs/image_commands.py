@@ -36,10 +36,10 @@ class ImageSwitcher(discord.ui.View):
     interaction: discord.Interaction
     images: list[Image]
 
-    def __init__(self, images: list[Image], ctx: commands.Context, timeout: float = 300.0):
+    def __init__(self, images: list[Image], interaction: discord.Interaction, timeout: float = 300.0):
         self.images = images
         self.image_count = len(images)
-        self.interaction = ctx.interaction
+        self.interaction = interaction
         super().__init__(timeout=timeout)
 
     async def send_message(self):
@@ -74,8 +74,8 @@ class ImageCommands(commands.Cog):
     def __init__(self, bot: NimbleNeutrinos):
         self.bot = bot
 
-    def _check_channel_enabled(self, ctx: commands.Context) -> bool:
-        db_channel = self.db.get_channel_by_discord_id(ctx.channel.id)
+    def _check_channel_enabled(self, interaction: discord.Interaction) -> bool:
+        db_channel = self.db.get_channel_by_discord_id(interaction.channel_id)
         return db_channel.enabled
 
     def _channel_disabled_embed(self) -> discord.Embed:
@@ -85,14 +85,16 @@ class ImageCommands(commands.Cog):
             description="Use the /enable command to enable CordPics in this channel",
         )
 
-    async def _get_last_image(self, ctx: commands.Context) -> discord.Message | None:
-        messages = ctx.channel.history(limit=50)
+    async def _get_last_image(self, interaction: discord.Interaction) -> discord.Message | None:
+        messages = interaction.channel.history(limit=50)
         message: discord.Message | None = None
         attachments: list[discord.Attachment] = []
         only_images: bool = False
 
         i: int = 0
-        while i < len(messages) and not (len(attachments) > 0 and only_images and message.author.id == ctx.author.id):
+        while i < len(messages) and not (
+            len(attachments) > 0 and only_images and message.author.id == interaction.user.id
+        ):
             message = await messages.__anext__()
             attachments = message.attachments
 
@@ -105,7 +107,7 @@ class ImageCommands(commands.Cog):
 
         return None if i == len(messages) else message
 
-    def _post_tags(self, ctx: commands.Context, message: discord.Message, tags: list[str]):
+    def _post_tags(self, message: discord.Message, tags: list[str]):
         tag_objects: list[models.Tag] = []
 
         for tag in tags:
@@ -143,12 +145,12 @@ class ImageCommands(commands.Cog):
         description="Add tags to the last image sent by you in this channel. (Max. 50 messages ago)",
     )
     @app_commands.describe(tags="Space separated list of tags")
-    async def add_tags(self, ctx: commands.Context, tags: str):
+    async def add_tags(self, interaction: discord.Interaction, tags: str):
         if not self._check_channel_enabled():
-            ctx.reply(embed=self._channel_disabled_embed(), ephemeral=True)
+            interaction.response.send_message(embed=self._channel_disabled_embed(), ephemeral=True)
             return
 
-        image_message: discord.Message | None = await self._get_last_image(ctx)
+        image_message: discord.Message | None = await self._get_last_image(interaction)
 
         if image_message is None:
             embed = discord.Embed(
@@ -156,7 +158,7 @@ class ImageCommands(commands.Cog):
                 description="Has the image been posted over 50 messages ago / in another channel?",
                 color=discord.Color.red(),
             )
-            await ctx.reply(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
 
         tag_list = [tag.lower() for tag in tags.split()]
@@ -164,7 +166,7 @@ class ImageCommands(commands.Cog):
         embed: discord.Embed
 
         try:
-            self._post_tags(ctx, image_message, tag_list)
+            self._post_tags(image_message, tag_list)
 
             embed = discord.Embed(
                 title="Image(s) Added!",
@@ -181,16 +183,16 @@ class ImageCommands(commands.Cog):
                 color=discord.Color.red(),
             )
 
-        await ctx.reply(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
-    async def _get_images_with_tags(self, ctx: commands.Context, str_tags: str) -> list[Image]:
+    async def _get_images_with_tags(self, interaction: discord.Interaction, str_tags: str) -> list[Image]:
         tags = [self.db.get_tag_by_name(tag.lower()) for tag in str_tags]
 
-        messages: list[models.Message] = self.db.get_messages_with_tags(tags, ctx.channel.id)
+        messages: list[models.Message] = self.db.get_messages_with_tags(tags, interaction.channel_id)
         images: list[Image] = []
 
         for message in messages:
-            discord_message = await ctx.fetch_message(message.discord_id)
+            discord_message = await interaction.channel.fetch_message(message.discord_id)
 
             images += [
                 Image(
@@ -211,24 +213,24 @@ class ImageCommands(commands.Cog):
     @app_commands.describe(
         tags="Space separated list of tags to search for",
     )
-    async def search(self, ctx: commands.Context, tags: str):
+    async def search(self, interaction: discord.Interaction, tags: str):
         if not self._check_channel_enabled():
-            ctx.reply(embed=self._channel_disabled_embed(), ephemeral=True)
+            interaction.repsonse.send_message(embed=self._channel_disabled_embed(), ephemeral=True)
             return
 
         tag_list = tags.split()
-        images: list[Image] = await self._get_images_with_tags(ctx, tag_list)
+        images: list[Image] = await self._get_images_with_tags(interaction, tag_list)
 
-        view = ImageSwitcher(images, ctx)
+        view = ImageSwitcher(images, interaction)
         await view.send_message()
 
     @app_commands.command(name="pics", description="View this channel's images on the cordpics website")
-    async def pics(self, ctx: commands.Context):
+    async def pics(self, interaction: discord.Interaction):
         if not self._check_channel_enabled():
-            ctx.reply(embed=self._channel_disabled_embed(), ephemeral=True)
+            interaction.response.send_message(embed=self._channel_disabled_embed(), ephemeral=True)
             return
 
-        db_channel = self.db.get_channel_by_discord_id(ctx.channel.id)
+        db_channel = self.db.get_channel_by_discord_id(interaction.channel_id)
         link = f"{getenv("HOME_URL")}/view?channel_id={db_channel.id}"
 
         embed = discord.Embed(
@@ -237,10 +239,10 @@ class ImageCommands(commands.Cog):
             description=link,
         )
 
-        ctx.reply(embed=embed)
+        interaction.response.send_message(embed=embed)
 
-    def update_channel_enabled(self, ctx: commands.Context, *, enabled: bool):
-        db_channel = self.db.get_channel_by_discord_id(ctx.channel.id)
+    def update_channel_enabled(self, interaction: discord.Interaction, *, enabled: bool):
+        db_channel = self.db.get_channel_by_discord_id(interaction.channel_id)
 
         self.db.update_channel(
             id=db_channel.id,
@@ -250,14 +252,14 @@ class ImageCommands(commands.Cog):
         )
 
     @app_commands.command(name="enable", description="Enable CordPics in this channel")
-    async def enable(self, ctx: commands.Context):
-        self.update_channel_enabled(ctx, enabled=True)
-        ctx.reply("CordPics has been enabled in this channel", ephemeral=True)
+    async def enable(self, interaction: discord.Interaction):
+        self.update_channel_enabled(interaction, enabled=True)
+        interaction.response.send_message("CordPics has been enabled in this channel", ephemeral=True)
 
     @app_commands.command(name="disable", description="Disable CordPics in this channel")
-    async def disable(self, ctx: commands.Context):
-        self.update_channel_enabled(ctx, enabled=False)
-        ctx.reply("CordPics has been disabled in this channel", ephemeral=True)
+    async def disable(self, interaction: discord.Interaction):
+        self.update_channel_enabled(interaction, enabled=False)
+        interaction.response.send_message("CordPics has been disabled in this channel", ephemeral=True)
 
 
 async def setup(bot: NimbleNeutrinos):
