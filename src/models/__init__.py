@@ -57,7 +57,7 @@ class Model:
         stmt = select(Tag).where(Tag.id == id)
         return self.session.scalars(stmt).one()
 
-    def get_tag_by_name(self, name: str) -> Tag:
+    def get_tag_by_name(self, name: str) -> Tag | None:
         """
         Get a tag by its name.
 
@@ -65,7 +65,7 @@ class Model:
             name (str): The name of the tag.
 
         Returns:
-            Tag: The tag with the given name.
+            Tag | None: The tag with the given name or None if it does not exist
         """
 
         stmt = select(Tag).where(Tag.name == name)
@@ -229,10 +229,19 @@ class Model:
             list[Message]: The messages with one or more of the given tags.
         """
 
-        # TODO: Make a query that returns an array of messages with the given tags
-        return []
+        tag_ids = [tag.id for tag in tags]
 
-    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite : bool = False) -> int:
+        # Create a statement to select messages
+        stmt = (
+            select(Message)
+            .distinct()
+            .select_from(Tag)
+            .filter(Tag.id.in_(tag_ids), Message.channel_id == channel_id)
+        )
+
+        return list(self.session.scalars(stmt))
+
+    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite: bool = False) -> int:
         """
         Create a new message.
 
@@ -498,3 +507,4 @@ class Model:
         server = self.session.scalar(stmt)
         self.session.delete(server)
         self.session.commit()
+
