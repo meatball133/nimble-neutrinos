@@ -1,4 +1,4 @@
-from config.db import get_session
+from src.config.db import get_session
 from .message import Message
 from .tags import Tag
 from .user import User
