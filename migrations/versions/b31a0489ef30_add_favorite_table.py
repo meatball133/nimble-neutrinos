@@ -1,8 +1,8 @@
-"""add favorite message
+"""add-favorite-table
 
-Revision ID: 9c80ee6d4157
+Revision ID: b31a0489ef30
 Revises: 548ee8f87feb
-Create Date: 2024-07-28 10:36:28.120050
+Create Date: 2024-07-28 12:58:04.888966
 
 """
 from typing import Sequence, Union
@@ -12,15 +12,15 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '9c80ee6d4157'
+revision: str = 'b31a0489ef30'
 down_revision: Union[str, None] = '548ee8f87feb'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.add_column("message", sa.Column("favorite", sa.Boolean, default=False))
+    pass
 
 
 def downgrade() -> None:
-    op.drop_column("message", "favorite")
+    pass
