@@ -183,6 +183,7 @@ class ImageCommands(commands.Cog):
                     src=attachment.url,
                 )
                 for attachment in discord_message.attachments
+                if attachment.content_type.startswith("image")
             ]
 
         return images
@@ -196,7 +197,7 @@ class ImageCommands(commands.Cog):
     )
     async def search(self, ctx: commands.Context, tags: str):
         tag_list = tags.split()
-        images: list[Image] = await self._query_images(ctx, tag_list)
+        images: list[Image] = await self._get_images_with_tags(ctx, tag_list)
 
         view = ImageSwitcher(images, ctx)
         await view.send_message()
