@@ -43,8 +43,20 @@ function setupServerListClickActions() {
     })
 }
 
+let currentServer;
+for (const server of document.getElementsByClassName("server")) {
+    server.addEventListener("click", e => {
+        if (currentServer && currentServer !== server) {
+            currentServer.classList.remove("current-server");
+        }
+        server.classList.add("current-server");
+        currentServer = server;
+    });
+}
+
 window.addEventListener("DOMContentLoaded", setupServerListClickActions)
 
 // window.addEventListener("load", e => {
 //     // loadData(testChannels);
 // });
+
