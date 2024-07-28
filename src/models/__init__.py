@@ -1,15 +1,14 @@
-from typing import NoReturn
+from config.db import get_session
+from .message import Message
+from .tags import Tag
+from .user import User
+from .attachment import Attachment
+from .channel import Channel
+from .server import Server
 
-from sqlalchemy import select, ScalarResult, Select
-
-from src.config.db import get_session
-from src.models.attachment import Attachment
-from src.models.channel import Channel
-from src.models.message import Message
-from src.models.server import Server
-from src.models.tags import Tag
-from src.models.user import User
-
+from sqlalchemy import select
+from sqlalchemy.exc import NoResultFound
+from typing import List, NoReturn
 
 
 class Model:
@@ -125,11 +124,7 @@ class Model:
             list[User]: A list of all users.
         """
         stmt = select(User)
-        return self.session.scalars(stmt)
-
-    def get_user_by_discord_id(self, discord_id: int) -> User:
-        stmt = select(User).where(User.discord_id == discord_id)
-        return self.session.scalars(stmt).one_or_none()
+        return list(self.session.scalars(stmt))
 
     def get_user_by_id(self, id: int) -> User:
         """
@@ -145,7 +140,7 @@ class Model:
         stmt = select(User).where(User.id == id)
         return self.session.scalars(stmt).one()
 
-    def create_user(self, discord_id: int, access_token: str, refresh_token: str) -> User:
+    def create_user(self, discord_id: int, access_token: str, refresh_token: str) -> int:
         """
         Create a new user.
 
@@ -161,7 +156,7 @@ class Model:
         new_user = User(discord_id=discord_id, access_token=access_token, refresh_token=refresh_token)
         self.session.add(new_user)
         self.session.commit()
-        return new_user
+        return new_user.id
 
     def update_user(self, id: int, discord_id: int, access_token: str, refresh_token: str) -> NoReturn:
         """
@@ -203,7 +198,7 @@ class Model:
         """
 
         stmt = select(Message)
-        return self.session.scalars(stmt)
+        return list(self.session.scalars(stmt))
 
     def get_message_by_id(self, id: int) -> Message:
         """
@@ -218,18 +213,6 @@ class Model:
 
         stmt = select(Message).where(Message.id == id)
         return self.session.scalars(stmt).one()
-
-    def get_message_by_discord_id(self, discord_id: int) -> Message:
-        stmt = select(Message).where(Message.discord_id == discord_id)
-        return self.session.scalars(stmt).one_or_none()
-
-    def get_messages_from_channels(self, channel_ids: list[int], count: int, page: int, author_id: int | None = None) -> list[
-        Message]:
-        stmt: Select = select(Message).filter(Message.channel_id.in_(channel_ids)).order_by(Message.id.desc())
-        if author_id is not None:
-            stmt = stmt.where(Message.user_id == author_id)
-        stmt = stmt.offset(page*count).limit(count)
-        return self.session.scalars(stmt).all()
 
     def get_messages_by_tags(self, tags: list[Tag], channel_id: int) -> list[Message]:
         """
@@ -247,15 +230,12 @@ class Model:
 
         # Create a statement to select messages
         stmt = (
-            select(Message)
-            .distinct()
-            .select_from(Tag)
-            .filter(Tag.id.in_(tag_ids), Message.channel_id == channel_id)
+            select(Message).distinct().select_from(Tag).filter(Tag.id.in_(tag_ids), Message.channel_id == channel_id)
         )
 
         return list(self.session.scalars(stmt))
 
-    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite: bool = False) -> Message:
+    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite: bool = False) -> int:
         """
         Create a new message.
 
@@ -268,14 +248,16 @@ class Model:
         Returns:
             int: The id of the new message
         """
-
+      
         new_message = Message(discord_id=discord_id, channel_id=channel_id, user_id=user_id, tags=tags, favorite=favorite)
 
         self.session.add(new_message)
         self.session.commit()
         return new_message
 
-    def update_message(self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite : bool = False) -> NoReturn:
+    def update_message(
+        self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite: list[User] = []
+    ) -> NoReturn:
         """
         Update a message.
 
@@ -318,7 +300,7 @@ class Model:
         """
 
         stmt = select(Attachment)
-        return self.session.scalars(stmt)
+        return list(self.session.scalars(stmt))
 
     def get_attachment_by_id(self, id: int) -> Attachment:
         """
@@ -384,7 +366,7 @@ class Model:
         self.session.delete(attachment)
         self.session.commit()
 
-    def get_channels(self) -> ScalarResult[Channel]:
+    def get_channels(self) -> list[Channel]:
         """
         Get all channels from the database.
 
@@ -393,11 +375,7 @@ class Model:
         """
 
         stmt = select(Channel)
-        return self.session.scalars(stmt)
-
-    def get_channels_in_server(self, server_id: int) -> ScalarResult[Channel]:
-        stmt = select(Channel).where(Channel.server_id == server_id)
-        return self.session.scalars(stmt)
+        return list(self.session.scalars(stmt))
 
     def get_channel_by_id(self, id: int) -> Channel:
         """
@@ -414,12 +392,22 @@ class Model:
         return self.session.scalars(stmt).one()
 
     def get_channel_by_discord_id(self, discord_id: int) -> Channel:
+        """
+        Get a channel by its discord id.
+
+        Args:
+            discord_id (int): The discord id of the channel.
+
+        Returns:
+            Channel: The channel with the given discord id.
+        """
+
         stmt = select(Channel).where(Channel.discord_id == discord_id)
         return self.session.scalars(stmt).one_or_none()
 
     def create_channel(self, discord_id: int, enabled: bool, server_id: int) -> Channel:
         """
-        Create a new server.
+        Create a new channel.
 
         Args:
             discord_id (int): The discord id of the channel.
@@ -427,8 +415,9 @@ class Model:
             server_id (int): The server id of the channel.
 
         Returns:
-            int: The id of the new server.
+            int: The id of the new channel
         """
+
         new_channel = Channel(discord_id=discord_id, enabled=enabled, server_id=server_id)
         self.session.add(new_channel)
         self.session.commit()
@@ -504,6 +493,7 @@ class Model:
         Returns:
             int: The id of the new server.
         """
+
         new_server = Server(discord_id=discord_id)
         self.session.add(new_server)
         self.session.commit()

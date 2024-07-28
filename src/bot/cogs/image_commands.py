@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from discord.ui import View
 
 from src.bot.main import CordPicsBot
 import src.bot.config
@@ -90,9 +91,9 @@ class ImageCommands(commands.Cog):
 
             i += 1
 
-        return message
+        return None if i == len(messages) else message
 
-    def _post_data(self, ctx: commands.Context, message: discord.Message, tags: list[str]):
+    def _post_tags(self, ctx: commands.Context, message: discord.Message, tags: list[str]):
         tag_objects: list[models.Tag] = []
 
         for tag in tags:
@@ -107,19 +108,16 @@ class ImageCommands(commands.Cog):
 
             tag_objects.append(new_tag)
 
-        message_id = self.db.create_message(
-            discord_id=message.id,
-            channel_id=ctx.channel.id,
-            user_id=ctx.author.id,
-            tags=tag_objects,
-        )
+        db_message: models.Message = self.db.get_message_by_discord_id(message.id)
 
-        for attachment in message.attachments:
-            if attachment.content_type.startswith("image"):
-                self.db.create_attachment(
-                    discord_id=attachment.id,
-                    message_id=message_id,
-                )
+        self.db.update_message(
+            id=db_message.id,
+            discord_id=db_message.discord_id,
+            channel_id=db_message.channel_id,
+            user_id=db_message.user_id,
+            tags=tag_objects,
+            favorite=db_message.favorite,
+        )
 
     @app_commands.command(
         name="addtags",
@@ -143,7 +141,7 @@ class ImageCommands(commands.Cog):
         embed: discord.Embed
 
         try:
-            self._post_data(ctx, image_message, tag_list)
+            self._post_tags(ctx, image_message, tag_list)
 
             embed = discord.Embed(
                 title="Image(s) Added!",
@@ -178,6 +176,7 @@ class ImageCommands(commands.Cog):
                     src=attachment.url,
                 )
                 for attachment in discord_message.attachments
+                if attachment.content_type.startswith("image")
             ]
 
         return images
@@ -191,10 +190,23 @@ class ImageCommands(commands.Cog):
     )
     async def search(self, ctx: commands.Context, tags: str):
         tag_list = tags.split()
-        images: list[Image] = await self._query_images(ctx, tag_list)
+        images: list[Image] = await self._get_images_with_tags(ctx, tag_list)
 
         view = ImageSwitcher(images, ctx)
         await view.send_message()
+
+    @app_commands.command(name="pics", description="View this channel's images on the cordpics website")
+    async def pics(self, ctx: commands.Context):
+        db_channel = self.db.get_channel_by_discord_id(ctx.channel.id)
+        link = f"{getenv("HOME_URL")}/view?channel_id={db_channel.id}"
+
+        embed = discord.Embed(
+            color=discord.Color.green(),
+            title="View channel in cordpics",
+            description=link,
+        )
+
+        ctx.reply(embed=embed)
 
 
 async def setup(bot: CordPicsBot):
