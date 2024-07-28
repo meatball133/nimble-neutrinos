@@ -6,6 +6,7 @@ from asyncpg import Pool
 
 from main import NimbleNeutrinos
 import config
+import models
 
 
 class Image:
@@ -14,7 +15,7 @@ class Image:
     tags: list[str]
     src: str
 
-    def __init__(self, id: str, user: discord.User, tags: [str], src: str) -> None:
+    def __init__(self, id: str, user: discord.User, tags: list[str], src: str) -> None:
         self.id = id
         self.user = user
         self.tags = tags
@@ -72,6 +73,7 @@ class ImageSwitcher(discord.ui.View):
 
 
 class ImageCommands(commands.Cog):
+    model: models.Model = models.Model()
     bot: NimbleNeutrinos
     db_pool: Pool
 
@@ -79,29 +81,48 @@ class ImageCommands(commands.Cog):
         self.bot = bot
         self.db_pool = bot.pool
 
-    async def _get_last_image(self, ctx: commands.Context):
+    async def _get_last_image(self, ctx: commands.Context) -> discord.Message:
         messages = ctx.channel.history(limit=50)
         message: discord.Message | None = None
         attachments: list[discord.Attachment] = []
+        image_attachments: list[discord.Attachment] = []
 
-        while not (
-            attachments
-            and len(attachments == 1)
-            and attachments[0].content_type.startswith("image")
-            and message.author.id == ctx.author.id
-        ):
+        while not (attachments and len(image_attachments) == 1 and message.author.id == ctx.author.id):
             message = await messages.__anext__()
             attachments = message.attachments
 
-        return attachments[0]
+            image_attachments = [
+                attachment for attachment in attachments if attachment.content_type.startswith("image")
+            ]
 
-    # TODO: Make this SQL request work (insert image with tags into database) and return appropriate boolean
-    async def _post_data(self, ctx: commands.Context, url: str, tag: list[str]):
-        db_response = await self.db_pool.execute(f"""
-            INSERT INTO {config.DB().DATABASE}
-        """)
+        return message
 
-        return bool(db_response)
+    def _post_data(self, ctx: commands.Context, message_id: int, tags: list[str]):
+        all_tags: list[models.Tag] = self.model.get_tags
+        tag_objects: list[models.Tag] = []
+
+        for tag in tags:
+            tag_index = -1
+            for i in range(len(all_tags)):
+                if tag == all_tags[i].name:
+                    tag_index = i
+                    break
+
+            new_tag: models.Tag
+            if tag_index == -1:
+                tag_id = self.model.create_tag(tag)
+                new_tag = self.model.get_tag_by_id(tag_id)
+            else:
+                new_tag = all_tags[i]
+
+            tag_objects.append(new_tag)
+
+        return self.model.create_message(
+            discord_id=message_id,
+            channel_id=ctx.channel.id,
+            user_id=ctx.author.id,
+            tags=tag_objects,
+        )
 
     @app_commands.command(
         name="addtags",
@@ -109,20 +130,23 @@ class ImageCommands(commands.Cog):
     )
     @app_commands.describe(tags="Space separated list of tags")
     async def add_tags(self, ctx: commands.Context, tags: str):
-        image: discord.Attachment = await self._get_last_image(ctx)
-        tag_list = tags.split()
+        image_message: discord.Message = await self._get_last_image(ctx)
+        tag_list = [tag.lower() for tag in tags.split()]
 
-        post_data_result = await self._post_data(ctx, image.url, tag_list)
         embed: discord.Embed
 
-        if post_data_result:
+        try:
+            self._post_data(ctx, image_message, tag_list)
+
             embed = discord.Embed(
                 title="Image Added!",
                 description=f"Tags: *{", ".join(tag_list)}*",
                 color=discord.Color.blurple(),
             )
-            embed.set_image(url=image.url)
-        else:
+            image_url = image_message.attachments[0].url
+            embed.set_image(url=image_url)
+
+        except Exception:
             embed = discord.Embed(
                 title="Error",
                 description="Request failed, please try again later",
