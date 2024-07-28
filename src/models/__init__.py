@@ -11,6 +11,7 @@ from src.models.tags import Tag
 from src.models.user import User
 
 
+
 class Model:
     def __init__(self):
         self.session = get_session()
@@ -56,6 +57,25 @@ class Model:
 
         stmt = select(Tag).where(Tag.id == id)
         return self.session.scalars(stmt).one()
+
+    def get_tag_by_name(self, name: str) -> Tag | None:
+        """
+        Get a tag by its name.
+
+        Args:
+            name (str): The name of the tag.
+
+        Returns:
+            Tag | None: The tag with the given name or None if it does not exist
+        """
+
+        stmt = select(Tag).where(Tag.name == name)
+        result = self.session.scalars(stmt)
+
+        try:
+            return result.one()
+        except NoResultFound:
+            return None
 
     def create_tag(self, name: str) -> int:
         """
@@ -214,7 +234,31 @@ class Model:
         stmt = stmt.offset(page*count).limit(count)
         return self.session.scalars(stmt).all()
 
-    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag]) -> Message:
+    def get_messages_by_tags(self, tags: list[Tag], channel_id: int) -> list[Message]:
+        """
+        Get messages that contain one or more of the given tags.
+
+        Args:
+            tags (list[Tag]): The tags being searched for.
+            channel_id (int): The id of the channel being searched.
+
+        Returns:
+            list[Message]: The messages with one or more of the given tags.
+        """
+
+        tag_ids = [tag.id for tag in tags]
+
+        # Create a statement to select messages
+        stmt = (
+            select(Message)
+            .distinct()
+            .select_from(Tag)
+            .filter(Tag.id.in_(tag_ids), Message.channel_id == channel_id)
+        )
+
+        return list(self.session.scalars(stmt))
+
+    def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite: bool = False) -> Message:
         """
         Create a new message.
 
@@ -228,13 +272,13 @@ class Model:
             int: The id of the new message
         """
 
-        new_message = Message(discord_id=discord_id, channel_id=channel_id, user_id=user_id, tags=tags)
+        new_message = Message(discord_id=discord_id, channel_id=channel_id, user_id=user_id, tags=tags, favorite=favorite)
 
         self.session.add(new_message)
         self.session.commit()
         return new_message
 
-    def update_message(self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[Tag]) -> NoReturn:
+    def update_message(self, id: int, discord_id: int, channel_id: int, user_id: int, tags: list[Tag], favorite : bool = False) -> NoReturn:
         """
         Update a message.
 
@@ -252,6 +296,7 @@ class Model:
         message.channel_id = channel_id
         message.user_id = user_id
         message.tags = tags
+        message.favorite = favorite
         self.session.commit()
 
     def delete_message(self, id: int) -> NoReturn:
@@ -380,7 +425,9 @@ class Model:
         Create a new server.
 
         Args:
-            discord_id (int): The discord id of the server.
+            discord_id (int): The discord id of the channel.
+            enabled (bool): Whether the channel should be checked for messages.
+            server_id (int): The server id of the channel.
 
         Returns:
             int: The id of the new server.
@@ -491,3 +538,4 @@ class Model:
         server = self.session.scalar(stmt)
         self.session.delete(server)
         self.session.commit()
+
