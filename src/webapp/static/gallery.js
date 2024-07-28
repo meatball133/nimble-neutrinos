@@ -471,6 +471,8 @@ window.addEventListener("load", (e) => {
         }
 
         // Load data
+        currentPage++;
+        fetchData();
 
     });
 
@@ -484,10 +486,17 @@ window.addEventListener("load", (e) => {
             selected.appendChild(e.currentTarget.cloneNode(true));
             currentChannel = e.currentTarget;
             currentChannel.classList.add("current-channel");
+            currentPage = 0;
+            clearGallery();
             fetchData();
         })
     })
 });
+
+function clearGallery() {
+    document.getElementById("gallery").innerHTML = ""
+    listOfImages = [];
+}
 
 function fetchData() {
     let tags = ""
@@ -504,11 +513,9 @@ function fetchData() {
         "tags": tags,
     }))
         .then(response => response.json()).then(data => {
-            if (currentPage === 0) {
-                document.getElementById("gallery").innerHTML = ""
-                listOfImages = [];
-            }
-            addData(data);
+        if (currentPage === 0) {
+        }
+        addData(data);
     })
 }
 

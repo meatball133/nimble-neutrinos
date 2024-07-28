@@ -225,7 +225,7 @@ class Model:
 
     def get_messages_from_channels(self, channel_ids: list[int], count: int, page: int, author_id: int | None = None) -> list[
         Message]:
-        stmt: Select = select(Message).filter(Message.channel_id.in_(channel_ids))
+        stmt: Select = select(Message).filter(Message.channel_id.in_(channel_ids)).order_by(Message.id.desc())
         if author_id is not None:
             stmt = stmt.where(Message.user_id == author_id)
         stmt = stmt.offset(page*count).limit(count)
