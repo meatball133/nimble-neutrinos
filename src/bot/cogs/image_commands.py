@@ -2,11 +2,10 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from asyncpg import Pool
 
-from main import NimbleNeutrinos
-import config
-import models
+from src.bot.main import CordPicsBot
+import src.bot.config
+from src import models
 
 
 class Image:
@@ -68,9 +67,9 @@ class ImageSwitcher(discord.ui.View):
 
 class ImageCommands(commands.Cog):
     db: models.Model = models.Model()
-    bot: NimbleNeutrinos
+    bot: CordPicsBot
 
-    def __init__(self, bot: NimbleNeutrinos):
+    def __init__(self, bot: CordPicsBot):
         self.bot = bot
 
     async def _get_last_image(self, ctx: commands.Context) -> discord.Message | None:
@@ -198,5 +197,5 @@ class ImageCommands(commands.Cog):
         await view.send_message()
 
 
-async def setup(bot: NimbleNeutrinos):
+async def setup(bot: CordPicsBot):
     await bot.add_cog(ImageCommands(bot))
