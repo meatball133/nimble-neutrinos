@@ -15,6 +15,7 @@ app.add_url_rule('/authme', view_func=endpoints.authorizer)
 app.add_url_rule('/install', view_func=endpoints.install_redirect)
 app.add_url_rule('/channels', view_func=endpoints.server_channels)
 app.add_url_rule('/updatechannel', view_func=endpoints.update_channel, methods=['POST'])
+app.add_url_rule('/media', view_func=endpoints.media)
 
 if __name__ == '__main__':
     app.run(debug=True)  # FIXME don't forget to remove debug=True later.

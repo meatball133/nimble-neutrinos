@@ -3,12 +3,68 @@ from os import getenv
 from flask import request, render_template, session, redirect, url_for, abort, jsonify
 
 from src.webapp import db, discord_api
+from src.webapp.decorators import login_required
 
 
 def mainpage():
     return render_template("index.j2")
 
 
+def media():
+    channels_to_search = []
+    server_id = request.args.get("server_id")
+    channel_id = request.args.get("channel_id")
+    page = request.args.get("page")
+    if page is None:
+        page = 0
+    mine_mode = bool(request.args.get("mine_mode"))
+
+    if server_id is None and channel_id is None:  # All media from all servers ("Everything" option).
+        user = db.get_user_by_id(session['user_id'])
+        user_servers = discord_api.get_user_guilds(user.access_token)
+        for server in user_servers:
+            server_in_db = db.get_server_by_discord_id(server["id"])
+            if server_in_db is None:
+                continue
+            channels_in_server = db.get_channels_in_server(server_in_db.id)
+            for channel in channels_in_server:
+                channels_to_search.append(channel.id)
+
+    if server_id is not None and channel_id is None:  # All media from one server.
+        channels_in_server = db.get_channels_in_server(server_id)
+        for channel in channels_in_server:
+            channels_to_search.append(channel.id)
+
+    if channel_id is not None:  # Media from one channel.
+        channels_to_search = [channel_id]
+
+    messages = db.get_messages_from_channels(
+        channels_to_search,
+        count=int(getenv("IMAGE_FETCH_COUNT")),
+        page=int(page),
+        author_id=session['user_id'] if mine_mode else None,
+    )
+    messages_json = []
+    for message in messages:
+        message_info = discord_api.get_message_info(
+            db.get_channel_by_id(message.channel_id).discord_id,
+            message.discord_id
+        )
+        messages_json.append({
+            "id": message.id,
+            "attachments": [
+                attachment["url"] for attachment in message_info["attachments"]
+            ],
+            "author_name": message_info["author"]["username"],
+            "author_avatar": message_info["author"]["avatar"],
+            "tags": ",".join(message.tags),
+            "timestamp": message_info["timestamp"],
+            "liked": False,
+        })
+    return jsonify(messages_json)
+
+
+@login_required
 def gallery():
     user = db.get_user_by_id(session['user_id'])
     user_servers = discord_api.get_user_guilds(user.access_token)

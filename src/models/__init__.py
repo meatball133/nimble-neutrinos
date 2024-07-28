@@ -1,6 +1,6 @@
 from typing import NoReturn
 
-from sqlalchemy import select, ScalarResult
+from sqlalchemy import select, ScalarResult, Select
 
 from src.config.db import get_session
 from src.models.attachment import Attachment
@@ -206,6 +206,14 @@ class Model:
         stmt = select(Message).where(Message.discord_id == discord_id)
         return self.session.scalars(stmt).one_or_none()
 
+    def get_messages_from_channels(self, channel_ids: list[int], count: int, page: int, author_id: int | None = None) -> list[
+        Message]:
+        stmt: Select = select(Message).filter(Message.channel_id.in_(channel_ids))
+        if author_id is not None:
+            stmt = stmt.where(Message.user_id == author_id)
+        stmt = stmt.offset(page*count).limit(count)
+        return self.session.scalars(stmt).all()
+
     def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag]) -> Message:
         """
         Create a new message.
@@ -283,6 +291,10 @@ class Model:
 
         stmt = select(Attachment).where(Attachment.id == id)
         return self.session.scalars(stmt).one()
+
+    def get_attachments_from_message(self, message_id: int) -> list[Attachment]:
+        stmt = select(Attachment).where(Attachment.message_id == message_id)
+        return self.session.scalars(stmt).all()
 
     def create_attachment(self, discord_id: int, message_id: int) -> int:
         """

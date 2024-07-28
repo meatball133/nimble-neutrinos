@@ -4,13 +4,14 @@ const favs = document.getElementById("favs");
 let current = all;
 let currentImage;
 let currentImageIndex;
+let currentPage = 0;
 const extraFilters = [all, mine, favs];
 for (const extraFilter of extraFilters) {
     extraFilter.addEventListener("click", (e) => {
         if (current !== extraFilter) {
-        current.classList.toggle("current-extra-filter");
-        extraFilter.classList.toggle("current-extra-filter");
-        current = extraFilter;
+            current.classList.toggle("current-extra-filter");
+            extraFilter.classList.toggle("current-extra-filter");
+            current = extraFilter;
         }
     });
 }
@@ -79,10 +80,10 @@ modalSearchTag.autocomplete = "off";
 
 let tagsNotSaved = [];
 
-modalSearchTag.addEventListener('keydown', function(e) {
+modalSearchTag.addEventListener('keydown', function (e) {
     const key = e.key;
     if (key === " ") {
-        let text = e.target.value;  
+        let text = e.target.value;
         if (text === "" || text === " ") {
             e.target.value = "";
             e.preventDefault();
@@ -95,7 +96,7 @@ modalSearchTag.addEventListener('keydown', function(e) {
 
         let removeTag = document.createElement("div");
         removeTag.classList.add("remove-tag");
-        
+
         removeTag.addEventListener("click", e => {
             modalTags.removeChild(tag)
         });
@@ -129,8 +130,8 @@ function resetModal() {
     modalActions.insertBefore(modalDelete, deleteConfirmation);
 
     confirmationPrompt.textContent = "Are you sure you want to delete this post?";
-    mode = "Preview"; 
-    
+    mode = "Preview";
+
     for (const tag of tagsNotSaved) {
         modalTags.removeChild(tag);
     }
@@ -154,7 +155,7 @@ modalModify.addEventListener("click", e => {
     modalActions.removeChild(modalHeart);
     modalActions.removeChild(modalModify);
     modalActions.removeChild(modalDelete);
-    
+
     modalActions.appendChild(saveTags);
     modalActions.appendChild(cancelEditTags);
 
@@ -167,7 +168,7 @@ modalModify.addEventListener("click", e => {
             modalTags.removeChild(tag);
         });
 
-        
+
         tag.appendChild(removeTag);
         tag.removeTag = removeTag;
     }
@@ -211,7 +212,7 @@ modalExit.addEventListener("click", () => {
     popup.style.opacity = "0";
     setTimeout(() => {
         popup.style.zIndex = "-1";
-        
+
         modalImage.src = "";
         modalProfile.src = "";
         modalUsername.textContent = "";
@@ -234,7 +235,7 @@ popup.addEventListener("click", e => {
     popup.style.opacity = "0";
     setTimeout(() => {
         popup.style.zIndex = "-1";
-        
+
         modalImage.src = "";
         modalProfile.src = "";
         modalUsername.textContent = "";
@@ -276,7 +277,7 @@ function setModal(index) {
     modalProfile.src = image.dataset.profile;
     modalUsername.textContent = image.dataset.user;
     modalImageUploadDate.textContent = image.dataset.postDate;
-    
+
     if (image.dataset.liked === "true") {
         modalHeart.classList.add("heart-liked");
     } else {
@@ -298,6 +299,7 @@ function setModal(index) {
 
 let columnCount = parseInt(getComputedStyle(gallery)["columnCount"]);
 let listOfImages = [];
+
 function addData(dataList) {
     for (const data of dataList) {
         let container = document.createElement("div");
@@ -320,7 +322,7 @@ function addData(dataList) {
         heart.classList.add("heart");
         if (data.liked === "true") {
             heart.classList.add("heart-liked");
-        } 
+        }
         heart.addEventListener("click", (e) => {
             image.dataset.liked = !(image.dataset.liked === "true");
             if (image.dataset.liked === "true") {
@@ -346,7 +348,7 @@ function addData(dataList) {
             modalProfile.src = data.profile;
             modalUsername.textContent = data.user;
             modalImageUploadDate.textContent = data.postDate;
-            
+
             if (image.dataset.liked === "true") {
                 modalHeart.classList.add("heart-liked");
             } else {
@@ -361,7 +363,7 @@ function addData(dataList) {
                 modalTags.appendChild(tagElement)
             }
 
-            
+
         });
 
 
@@ -373,7 +375,7 @@ function addData(dataList) {
 
         listOfImages.push(container);
     }
-    for (let i = 0; i < columnCount; i+=1) {
+    for (let i = 0; i < columnCount; i += 1) {
         for (let j = i; j < listOfImages.length; j += columnCount) {
             gallery.appendChild(listOfImages[j]);
         }
@@ -383,7 +385,7 @@ function addData(dataList) {
 window.addEventListener("resize", e => {
     if (parseInt(getComputedStyle(gallery)["columnCount"]) !== columnCount) {
         columnCount = parseInt(getComputedStyle(gallery)["columnCount"])
-        for (let i = 0; i < columnCount; i+=1) {
+        for (let i = 0; i < columnCount; i += 1) {
             for (let j = i; j < listOfImages.length; j += columnCount) {
                 gallery.appendChild(listOfImages[j]);
             }
@@ -394,10 +396,10 @@ window.addEventListener("resize", e => {
 const searchFilter = document.getElementById("search-filter");
 const searchBar = document.getElementById("search-bar");
 
-searchFilter.addEventListener('keydown', function(e) {
+searchFilter.addEventListener('keydown', function (e) {
     const key = e.key;
     if (key === " ") {
-        let text = e.target.value;  
+        let text = e.target.value;
         if (text === "" || text === " ") {
             e.target.value = "";
             e.preventDefault();
@@ -410,7 +412,7 @@ searchFilter.addEventListener('keydown', function(e) {
 
         let removeTag = document.createElement("div");
         removeTag.classList.add("remove-tag");
-        
+
         removeTag.addEventListener("click", e => {
             searchFilter.removeChild(e.target.parentNode)
         });
@@ -436,7 +438,7 @@ const channelSelectItems = document.getElementById("channel-select-items");
 const channelSelectImage = document.getElementById("channel-select-image");
 const selectedChannel = document.getElementById("selected-channel");
 channelSelect.addEventListener("click", e => {
-   channelSelectItems.classList.toggle("channel-select-items-invisible"); 
+    channelSelectItems.classList.toggle("channel-select-items-invisible");
 });
 
 let currentChannel = document.querySelector(".current-channel");
@@ -495,7 +497,7 @@ function addChannels(channels) {
                     currentChannel.classList.remove("current-channel");
                 }
                 currentChannel = e.target;
-    
+
                 channelSelectText.textContent = e.target.textContent;
 
                 if (selectedChannel.classList.contains("server-option")) {
@@ -514,19 +516,18 @@ const sentinel = document.getElementById("sentinel");
 window.addEventListener("load", (e) => {
     // Todo: Implement get data and channels
     addData(testData);
-    addChannels(testChannels);
 
     let intersectionObserver = new IntersectionObserver(entries => {
 
-    
+
         if (entries[0].intersectionRatio <= 0) {
-          return;
+            return;
         }
-    
+
         // Load data
-    
+
     });
-    
+
     intersectionObserver.observe(sentinel);
 
     document.querySelectorAll(".channel-option").forEach(element => {
@@ -568,10 +569,10 @@ window.addEventListener("load", (e) => {
 const testData = [
     {
         image:
-        "https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187.jpg",
+            "https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187.jpg",
         user: "Username",
         profile:
-        "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
+            "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
         tags: "tag1,tag2,tag3,tag4",
         postDate: "21/07/2024",
         liked: true,
@@ -579,10 +580,10 @@ const testData = [
     },
     {
         image:
-        "https://www.humanesociety.org/sites/default/files/styles/400x400/public/2018/06/cat-217679.jpg",
+            "https://www.humanesociety.org/sites/default/files/styles/400x400/public/2018/06/cat-217679.jpg",
         user: "Username",
         profile:
-        "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
+            "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
         tags: "tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4",
         postDate: "21/07/2024",
         liked: false,
@@ -590,10 +591,10 @@ const testData = [
     },
     {
         image:
-        "https://www.usatoday.com/gcdn/authoring/authoring-images/2023/11/02/USAT/71425480007-getty-images-1498838344.jpg?crop=1060,1413,x530,y0",
+            "https://www.usatoday.com/gcdn/authoring/authoring-images/2023/11/02/USAT/71425480007-getty-images-1498838344.jpg?crop=1060,1413,x530,y0",
         user: "Username",
         profile:
-        "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
+            "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
         tags: "tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4,tag1,tag2,tag3,tag4",
         postDate: "21/07/2024",
         liked: false,
@@ -601,10 +602,10 @@ const testData = [
     },
     {
         image:
-        "https://www.alleycat.org/wp-content/uploads/2015/12/RS34996_BuenaVistaColony_1518.jpg",
+            "https://www.alleycat.org/wp-content/uploads/2015/12/RS34996_BuenaVistaColony_1518.jpg",
         user: "Username",
         profile:
-        "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
+            "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
         tags: "tag1,tag2,tag3,tag4",
         postDate: "21/07/2024",
         liked: false,
@@ -612,10 +613,10 @@ const testData = [
     },
     {
         image:
-        "https://cats.com/wp-content/uploads/2024/02/96E4B546-9BE7-4977-9A29-05F2D9BB47BC_1_102_a-e1711411797978.jpeg",
+            "https://cats.com/wp-content/uploads/2024/02/96E4B546-9BE7-4977-9A29-05F2D9BB47BC_1_102_a-e1711411797978.jpeg",
         user: "Username",
         profile:
-        "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
+            "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
         tags: "tag1,tag2,tag3,tag4",
         postDate: "21/07/2024",
         liked: true,
@@ -623,10 +624,10 @@ const testData = [
     },
     {
         image:
-        "https://static.scientificamerican.com/sciam/cache/file/2AE14CDD-1265-470C-9B15F49024186C10_source.jpg",
+            "https://static.scientificamerican.com/sciam/cache/file/2AE14CDD-1265-470C-9B15F49024186C10_source.jpg",
         user: "Username",
         profile:
-        "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
+            "https://pyxis.nymag.com/v1/imgs/a59/8f2/af4ffa51c4bbd612e05e8a0f26cba27f5c-shrek.rsquare.w400.jpg",
         tags: "tag1,tag2,tag3,tag4",
         postDate: "21/07/2024",
         liked: false,
