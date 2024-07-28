@@ -408,6 +408,20 @@ class Model:
         stmt = select(Channel).where(Channel.id == id)
         return self.session.scalars(stmt).one()
 
+    def get_channel_by_discord_id(self, discord_id: int) -> Channel:
+        """
+        Get a channel by its discord id.
+
+        Args:
+            discord_id (int): The discord id of the channel.
+
+        Returns:
+            Channel: The channel with the given discord id.
+        """
+
+        stmt = select(Channel).where(Channel.discord_id == discord_id)
+        return self.session.scalars(stmt).one()
+
     def create_channel(self, discord_id: int, enabled: bool, server_id: int) -> int:
         """
         Create a new channel.

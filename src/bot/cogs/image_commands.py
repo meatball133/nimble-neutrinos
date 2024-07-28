@@ -1,8 +1,10 @@
+from os import getenv
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 from asyncpg import Pool
+from discord.ui import View
 
 from main import NimbleNeutrinos
 import config
@@ -201,6 +203,19 @@ class ImageCommands(commands.Cog):
 
         view = ImageSwitcher(images, ctx)
         await view.send_message()
+
+    @app_commands.command(name="pics", description="View this channel's images on the cordpics website")
+    async def pics(self, ctx: commands.Context):
+        db_channel = self.db.get_channel_by_discord_id(ctx.channel.id)
+        link = f"{getenv("HOME_URL")}/view?channel_id={db_channel.id}"
+
+        embed = discord.Embed(
+            color=discord.Color.green(),
+            title="View channel in cordpics",
+            description=link,
+        )
+
+        ctx.reply(embed=embed)
 
 
 async def setup(bot: NimbleNeutrinos):
