@@ -60,6 +60,7 @@ def update_channel():
     return ""
 
 
+@login_required
 def management():
     user = db.get_user_by_id(session['user_id'])
     user_guilds = discord_api.get_user_guilds(user.access_token)
