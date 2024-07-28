@@ -53,10 +53,6 @@ class ImageSwitcher(discord.ui.View):
             view=self,
         )
 
-    @discord.ui.button(label="View on Web", style=discord.ButtonStyle.green)
-    async def web_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        pass  # This function should redirect the user to the web page of the image
-
     @discord.ui.button(label="Back", style=discord.ButtonStyle.blurple)
     async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.cur_image = (self.cur_image - 1) % self.image_count
@@ -170,7 +166,7 @@ class ImageCommands(commands.Cog):
     async def _get_images_with_tags(self, ctx: commands.Context, str_tags: str) -> list[Image]:
         tags = [self.db.get_tag_by_name(tag.lower()) for tag in str_tags]
 
-        messages: list[models.Message] = self.db.get_messages_by_tags(tags, ctx.channel.id)
+        messages: list[models.Message] = self.db.get_messages_with_tags(tags, ctx.channel.id)
         images: list[Image] = []
 
         for message in messages:
