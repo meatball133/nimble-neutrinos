@@ -1,4 +1,5 @@
 from os import getenv
+from time import sleep
 
 from dotenv import load_dotenv
 from flask import url_for
@@ -59,6 +60,13 @@ class DiscordApi:
         headers = {
             'Authorization': f"Bot {getenv('BOT_TOKEN')}",
         }
-        response = self.rsession.get(self.base_url + f'/channels/{channel_id}/messages/{message_id}', headers=headers)
+        while True:
+            response = self.rsession.get(self.base_url + f'/channels/{channel_id}/messages/{message_id}', headers=headers)
+            if response.status_code == 429:
+                sleep(float(response.json()["retry_after"]))
+                continue
+            else:
+                break
+
         response.raise_for_status()
         return response.json()

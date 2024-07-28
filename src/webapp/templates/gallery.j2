@@ -14,11 +14,13 @@
       <span class="channel-list-option current-channel">Everything</span>
         {% for guild in guilds %}
             <div class="server-option channel-list-option">
+            <span class="server-id channel-list-id">{{ guild.id }}</span>
             <img class="server-image" src="https://cdn.discordapp.com/icons/{{ guild.discord_id }}/{{ guild.icon }}" alt="Server icon">
             <span>{{ guild.name }}</span>
             </div>
             {% for channel in guild.channels %}
                 <div class="channel-option channel-list-option">
+                <span class="channel-id channel-list-id">{{ channel.id }}</span>
                 <span>#{{ channel.name }}</span>
                 </div>
             {% endfor %}

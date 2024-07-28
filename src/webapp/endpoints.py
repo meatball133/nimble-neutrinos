@@ -13,11 +13,13 @@ def mainpage():
 def media():
     channels_to_search = []
     server_id = request.args.get("server_id")
+    if server_id == "": server_id = None
     channel_id = request.args.get("channel_id")
+    if channel_id == "": channel_id = None
     page = request.args.get("page")
     if page is None:
         page = 0
-    mine_mode = bool(request.args.get("mine_mode"))
+    mine_mode = bool(int(request.args.get("mine_mode")))
 
     if server_id is None and channel_id is None:  # All media from all servers ("Everything" option).
         user = db.get_user_by_id(session['user_id'])
@@ -57,6 +59,7 @@ def media():
             ],
             "author_name": message_info["author"]["username"],
             "author_avatar": message_info["author"]["avatar"],
+            "author_discord_id": message_info["author"]["id"],
             "tags": ",".join(message.tags),
             "timestamp": message_info["timestamp"],
             "liked": False,

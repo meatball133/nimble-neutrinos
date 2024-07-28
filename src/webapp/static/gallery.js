@@ -306,13 +306,13 @@ function addData(dataList) {
         container.classList.add("gallery-item");
 
         let image = document.createElement("img");
-        image.src = data.image;
+        image.src = data.attachments[0];
         image.classList.add("gallery-image");
-        image.dataset.user = data.user;
-        image.dataset.profile = data.profile;
-        image.dataset.postDate = data.postDate;
+        image.dataset.user = data.author_name;
+        image.dataset.profile = `https://cdn.discordapp.com/avatars/${data.author_discord_id}/${data.author_avatar}.png`;
+        image.dataset.postDate = data.timestamp;
         image.dataset.liked = data.liked;
-        image.dataset.postId = data.postId;
+        image.dataset.postId = data.id;
         image.dataset.tags = data.tags;
 
         let imageActions = document.createElement("div");
@@ -344,10 +344,10 @@ function addData(dataList) {
             popup.style.opacity = "1";
             popup.style.zIndex = "20";
 
-            modalImage.src = data.image;
-            modalProfile.src = data.profile;
-            modalUsername.textContent = data.user;
-            modalImageUploadDate.textContent = data.postDate;
+            modalImage.src = data.attachments[0];
+            modalProfile.src = `https://cdn.discordapp.com/avatars/${data.author_discord_id}/${data.author_avatar}.png`;
+            modalUsername.textContent = data.author_name;
+            modalImageUploadDate.textContent = data.timestamp;
 
             if (image.dataset.liked === "true") {
                 modalHeart.classList.add("heart-liked");
@@ -457,65 +457,11 @@ currentChannel.addEventListener("click", e => {
     }
 });
 
-
-function addChannels(channels) {
-    for (const [server, serverData] of Object.entries(channels)) {
-        let serverOption = document.createElement("div");
-        let serverName = document.createElement("span");
-        let serverImage = document.createElement("img");
-        serverImage.src = serverData.serverImage;
-        serverImage.classList.add("server-image");
-        serverName.textContent = server;
-        serverOption.classList.add("server-option");
-        serverOption.classList.add("channel-list-option");
-        serverOption.appendChild(serverImage);
-        serverOption.appendChild(serverName);
-        serverOption.addEventListener("click", e => {
-            e.target.classList.add("current-channel");
-            if (currentChannel !== e.target && currentChannel) {
-                currentChannel.classList.remove("current-channel");
-            }
-            currentChannel = e.target;
-
-            channelSelectText.textContent = e.target.textContent;
-            selectedChannel.classList.add("server-option");
-            channelSelectImage.src = serverData.serverImage;
-        });
-
-        channelSelectItems.appendChild(serverOption);
-        let serverChannels = serverData.channels;
-        for (const channel of serverChannels) {
-            let channelOption = document.createElement("div");
-            let channelName = document.createElement("span");
-            channelName.textContent = channel;
-            channelOption.classList.add("channel-option");
-            channelOption.classList.add("channel-list-option");
-            channelOption.appendChild(channelName);
-            channelOption.addEventListener("click", e => {
-                e.target.classList.add("current-channel");
-                if (currentChannel !== e.target && currentChannel) {
-                    currentChannel.classList.remove("current-channel");
-                }
-                currentChannel = e.target;
-
-                channelSelectText.textContent = e.target.textContent;
-
-                if (selectedChannel.classList.contains("server-option")) {
-                    selectedChannel.classList.remove("server-option");
-                    channelSelectImage.src = "";
-                }
-            });
-
-            channelSelectItems.appendChild(channelOption);
-        }
-    }
-}
-
 const sentinel = document.getElementById("sentinel");
 
 window.addEventListener("load", (e) => {
     // Todo: Implement get data and channels
-    addData(testData);
+    // addData(testData);
 
     let intersectionObserver = new IntersectionObserver(entries => {
 
@@ -530,38 +476,41 @@ window.addEventListener("load", (e) => {
 
     intersectionObserver.observe(sentinel);
 
-    document.querySelectorAll(".channel-option").forEach(element => {
+    document.querySelectorAll(".channel-list-option").forEach(element => {
         element.addEventListener("click", e => {
-            e.target.classList.add("current-channel");
-            if (currentChannel !== e.target && currentChannel) {
-                currentChannel.classList.remove("current-channel");
-            }
-            currentChannel = e.target;
-
-            channelSelectText.textContent = e.target.textContent;
-
-            if (selectedChannel.classList.contains("server-option")) {
-                selectedChannel.classList.remove("server-option");
-                channelSelectImage.src = "";
-            }
+            currentChannel.classList.remove("current-channel");
+            let selected = document.querySelector("#selected-channel");
+            selected.innerHTML = "";
+            selected.appendChild(e.currentTarget.cloneNode(true));
+            currentChannel = e.currentTarget;
+            currentChannel.classList.add("current-channel");
+            fetchData();
         })
     })
-
-    document.querySelectorAll(".server-option").forEach(element => {
-        element.addEventListener("click", e => {
-            e.target.classList.add("current-channel");
-            if (currentChannel !== e.target && currentChannel) {
-                currentChannel.classList.remove("current-channel");
-            }
-            currentChannel = e.target;
-
-            channelSelectText.textContent = e.target.textContent;
-            selectedChannel.classList.add("server-option");
-            channelSelectImage.src = serverData.serverImage;
-        })
-    })
-
 });
+
+function fetchData() {
+    let tags = ""
+    document.querySelectorAll(".search-bar-tag").forEach(element => {
+        tags += `${element.innerText},`
+    })
+    let channel_id = currentChannel.querySelector(".channel-id");
+    let server_id = currentChannel.querySelector(".server-id");
+    fetch("/media?" + new URLSearchParams({
+        "channel_id": channel_id == null ? "" : channel_id.innerText,
+        "server_id": server_id == null ? "" : server_id.innerText,
+        "page": currentPage,
+        "mine_mode": current === mine ? 1 : 0,
+        "tags": tags,
+    }))
+        .then(response => response.json()).then(data => {
+            if (currentPage === 0) {
+                document.getElementById("gallery").innerHTML = ""
+                listOfImages = [];
+            }
+            addData(data);
+    })
+}
 
 
 // Test data below

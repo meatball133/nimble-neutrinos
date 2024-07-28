@@ -72,10 +72,7 @@ class Model:
         stmt = select(Tag).where(Tag.name == name)
         result = self.session.scalars(stmt)
 
-        try:
-            return result.one()
-        except NoResultFound:
-            return None
+        return result.one_or_none()
 
     def create_tag(self, name: str) -> int:
         """
