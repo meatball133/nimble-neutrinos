@@ -20,3 +20,4 @@ class Message(Base):
     discord_id: Mapped[int] = mapped_column()
     channel_id: Mapped[int] = mapped_column(ForeignKey("channel.id"))
     tags: Mapped[List[Tag]] = relationship(secondary=association_table)
+    favorite: Mapped[bool] = mapped_column(default=False)
