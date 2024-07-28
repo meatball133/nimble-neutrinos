@@ -81,24 +81,28 @@ class ImageCommands(commands.Cog):
         self.bot = bot
         self.db_pool = bot.pool
 
-    async def _get_last_image(self, ctx: commands.Context) -> discord.Message:
+    async def _get_last_image(self, ctx: commands.Context) -> discord.Message | None:
         messages = ctx.channel.history(limit=50)
         message: discord.Message | None = None
         attachments: list[discord.Attachment] = []
-        image_attachments: list[discord.Attachment] = []
+        only_images: bool = False
 
-        while not (attachments and len(image_attachments) == 1 and message.author.id == ctx.author.id):
+        i: int = 0
+        while i < len(messages) and not (len(attachments) > 0 and only_images and message.author.id == ctx.author.id):
             message = await messages.__anext__()
             attachments = message.attachments
 
-            image_attachments = [
-                attachment for attachment in attachments if attachment.content_type.startswith("image")
-            ]
+            only_images = True
+            for attachment in attachments:
+                if not attachment.content_type.startswith("image"):
+                    only_images = False
+
+            i += 1
 
         return message
 
-    def _post_data(self, ctx: commands.Context, message_id: int, tags: list[str]):
-        all_tags: list[models.Tag] = self.model.get_tags
+    def _post_data(self, ctx: commands.Context, message: discord.Message, tags: list[str]):
+        all_tags: list[models.Tag] = self.model.get_tags()
         tag_objects: list[models.Tag] = []
 
         for tag in tags:
@@ -117,12 +121,19 @@ class ImageCommands(commands.Cog):
 
             tag_objects.append(new_tag)
 
-        return self.model.create_message(
-            discord_id=message_id,
+        message_id = self.model.create_message(
+            discord_id=message.id,
             channel_id=ctx.channel.id,
             user_id=ctx.author.id,
             tags=tag_objects,
         )
+
+        for attachment in message.attachments:
+            if attachment.content_type.startswith("image"):
+                self.model.create_attachment(
+                    discord_id=attachment.id,
+                    message_id=message_id,
+                )
 
     @app_commands.command(
         name="addtags",
@@ -130,7 +141,17 @@ class ImageCommands(commands.Cog):
     )
     @app_commands.describe(tags="Space separated list of tags")
     async def add_tags(self, ctx: commands.Context, tags: str):
-        image_message: discord.Message = await self._get_last_image(ctx)
+        image_message: discord.Message | None = await self._get_last_image(ctx)
+
+        if image_message is None:
+            embed = discord.Embed(
+                title="No Image Found",
+                description="Has the image been posted over 50 messages ago / in another channel?",
+                color=discord.Color.red(),
+            )
+            await ctx.reply(embed=embed)
+            return
+
         tag_list = [tag.lower() for tag in tags.split()]
 
         embed: discord.Embed
@@ -139,7 +160,7 @@ class ImageCommands(commands.Cog):
             self._post_data(ctx, image_message, tag_list)
 
             embed = discord.Embed(
-                title="Image Added!",
+                title="Image(s) Added!",
                 description=f"Tags: *{", ".join(tag_list)}*",
                 color=discord.Color.blurple(),
             )
@@ -155,13 +176,9 @@ class ImageCommands(commands.Cog):
 
         await ctx.reply(embed=embed)
 
-    # TODO: Make this SQL request work too (get all images in the channel with the given tags and/or from given user)
-    # and return a list of Image objects
+    # TODO: Use model functions to search for images with matching tags/user
+    # Will happen when the appropriate model functions are integrated
     async def _query_images(self, user: str | None, tags: str | None) -> list[Image]:
-        db_response = self.db_pool.fetch(f"""
-        SELECT * FROM {config.DB().DATABASE}
-        """)
-
         return []
 
     @app_commands.command(
