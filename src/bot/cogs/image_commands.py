@@ -10,13 +10,11 @@ import models
 
 
 class Image:
-    id: str
     user: discord.User
     tags: list[str]
     src: str
 
-    def __init__(self, id: str, user: discord.User, tags: list[str], src: str) -> None:
-        self.id = id
+    def __init__(self, user: discord.User, tags: list[str], src: str) -> None:
         self.user = user
         self.tags = tags
         self.src = src
@@ -169,23 +167,36 @@ class ImageCommands(commands.Cog):
 
         await ctx.reply(embed=embed)
 
-    # TODO: Use model functions to search for images with matching tags/user
-    # Will happen when the appropriate model functions are integrated
-    async def _query_images(self, user: str | None, tags: str | None) -> list[Image]:
-        return []
+    async def _get_images_with_tags(self, ctx: commands.Context, str_tags: str) -> list[Image]:
+        tags = [self.db.get_tag_by_name(tag.lower()) for tag in str_tags]
+
+        messages: list[models.Message] = self.db.get_messages_by_tags(tags, ctx.channel.id)
+        images: list[Image] = []
+
+        for message in messages:
+            discord_message = await ctx.fetch_message(message.discord_id)
+
+            images += [
+                Image(
+                    user=discord_message.author,
+                    tags=[tag.name for tag in message.tags],
+                    src=attachment.url,
+                )
+                for attachment in discord_message.attachments
+            ]
+
+        return images
 
     @app_commands.command(
         name="search",
         description="Search for image using tags (searches through current channel).",
     )
     @app_commands.describe(
-        tags="Space separated list of tags to search for (optional)",
-        user="Username of the poster of the image (optional)",
+        tags="Space separated list of tags to search for",
     )
-    async def search(self, ctx: commands.Context, tags: str | None, user: str | None = None):
-        tag_list = (tags if tags else "").split()
-        tag_list = [tag.lower() for tag in tag_list]
-        images: list[Image] = await self._query_images(user, tags)
+    async def search(self, ctx: commands.Context, tags: str):
+        tag_list = tags.split()
+        images: list[Image] = await self._query_images(ctx, tag_list)
 
         view = ImageSwitcher(images, ctx)
         await view.send_message()

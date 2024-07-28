@@ -217,6 +217,21 @@ class Model:
         stmt = select(Message).where(Message.id == id)
         return self.session.scalars(stmt).one()
 
+    def get_messages_by_tags(self, tags: list[Tag], channel_id: int) -> list[Message]:
+        """
+        Get messages that contain one or more of the given tags.
+
+        Args:
+            tags (list[Tag]): The tags being searched for.
+            channel_id (int): The id of the channel being searched.
+
+        Returns:
+            list[Message]: The messages with one or more of the given tags.
+        """
+
+        # TODO: Make a query that returns an array of messages with the given tags
+        return []
+
     def create_message(self, discord_id: int, channel_id: int, user_id: int, tags: list[Tag]) -> int:
         """
         Create a new message.
