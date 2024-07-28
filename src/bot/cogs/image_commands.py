@@ -22,7 +22,7 @@ class Image:
         self.src = src
 
     def get_embed(self) -> discord.Embed:
-        embed = discord.Embed()
+        embed = discord.Embed(color=discord.Color.blurple())
 
         embed.set_author(name=self.user.name)
         embed.add_field(name="Tags", value=f"*{", ".join(self.tags)}*")
